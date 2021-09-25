@@ -1,0 +1,40 @@
+server:
+  port: ${PORT:8888}
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:kalipoison/shop-java.git
+          username:  # git 账号
+          password:  # git密码
+          search-paths: /shop-config/** # shop-java项目shop-config文件夹下，存放配置文件
+      discovery:
+        enabled: true # 开启配置文件发现功能
+  rabbitmq: # mq 配置
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /v-shop
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://admin:admin@localhost:8761/eureka}
+  instance:
+    hostname: ${HOST:localhost}
+    prefer-ip-address: true
+    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 3
+    lease-expiration-duration-in-seconds: 9
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+
+
