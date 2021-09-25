@@ -1,0 +1,30 @@
+server:
+  port: ${PORT:8761}
+
+spring:
+  application:
+    name: eureka-server
+  security:
+    user:
+      name: admin
+      password: admin
+
+eureka:
+  client:
+    server-url:
+      defaultZone: ${EUREKA_SERVER:http://admin:admin@${eureka.instance.hostname}:${server.port}/eureka}
+    fetch-registry: false
+    register-with-eureka: false
+  instance:
+    hostname: ${HOST:localhost}
+    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+    prefer-ip-address: ${PREFER_IP_ADDRESS:true}
+    lease-renewal-interval-in-seconds: 3 # 续约实例的时间
+    lease-expiration-duration-in-seconds: 10 # 剔除节点的时间
+  server:
+    response-cache-auto-expiration-in-seconds: 30 # 设置eureka-server向client响应的缓存列表的时间
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  # 暴露健康检查的端点
