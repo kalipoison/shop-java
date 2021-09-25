@@ -1,0 +1,15 @@
+server:
+  port: ${PORT:80}
+
+spring:
+  rabbitmq: # mq 配置
+    host: 127.0.0.1
+    username: guest
+    password: guest
+    virtual-host: /v-shop
+  redis:  # redis配置
+    host: 127.0.0.1
+    port: 6380
+    password:
+    database: 0
+ 
