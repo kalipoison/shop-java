@@ -12,4 +12,8 @@ spring:
     port: 6380
     password:
     database: 0
- 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  # 暴露健康检查的端点
