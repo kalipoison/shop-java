@@ -9,8 +9,8 @@ spring:
       server:
         git:
           uri: git@github.com:kalipoison/shop-java.git
-          username:  # git 账号
-          password:  # git密码
+          username:  1174616074@qq.com # git 账号
+          password:  z1998621 # git密码
           search-paths: /shop-config/** # shop-java项目shop-config文件夹下，存放配置文件
       discovery:
         enabled: true # 开启配置文件发现功能

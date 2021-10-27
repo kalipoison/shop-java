@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:10086}
+spring:
+  application:
+    name: admin-server
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://admin:admin@localhost:8761/eureka}
+  instance:
+    hostname: ${HOST:localhost}
+    prefer-ip-address: true
+    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 3
+    lease-expiration-duration-in-seconds: 9
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  # 暴露健康检查的端点
