@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration;
 @MapperScan(basePackages = {"com.gohb.mapper"})
 public class MybatisPlusConfig {
 
+    /**
+     * 做分页
+     * @return
+     */
     @Bean
     public PaginationInnerInterceptor paginationInnerInterceptor(){
         return new PaginationInnerInterceptor();
