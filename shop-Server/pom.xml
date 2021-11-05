@@ -5,6 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>cloud-iaas</module>
+        <module>shop-common</module>
     </modules>
 
     <parent>

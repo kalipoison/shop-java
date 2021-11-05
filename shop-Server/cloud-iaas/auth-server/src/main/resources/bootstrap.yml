@@ -1,19 +1,15 @@
 spring:
   application:
-    name: gateway
-  cloud:  # config客户端的配置
+    name: auth-server
+  cloud:
     config:
-      name: gateway
+      name: auth-server
       profile: dev
       label: master
       discovery:
+        service-id: config-server
         enabled: true
-        service-id: config-server  # 和config-server结合
-    gateway:
-      discovery:
-        locator:
-          enabled: true  # 开启动态路由
-          lower-case-service-id: true  # 转换服务名称小写
+
 
 eureka:
   client:
@@ -25,10 +21,5 @@ eureka:
     instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
     lease-renewal-interval-in-seconds: 3
     lease-expiration-duration-in-seconds: 9
-
-
-
-
-
 
 
