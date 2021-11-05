@@ -1,6 +1,7 @@
 package com.gohb.config;
 
 import cn.hutool.core.io.FileUtil;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -24,16 +25,16 @@ import java.security.KeyPair;
 @EnableGlobalMethodSecurity(prePostEnabled = true) //开启方法级的验证
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-
-
+    @Bean
     public TokenStore tokenStore(){
         return new JwtTokenStore(jwtAccessTokenConverter());
     }
 
     /**
-     * 设置公钥
+     * 做公钥的解析
      * @return
      */
+    @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter(){
         JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
         ClassPathResource resource = new ClassPathResource("publicKey.txt");

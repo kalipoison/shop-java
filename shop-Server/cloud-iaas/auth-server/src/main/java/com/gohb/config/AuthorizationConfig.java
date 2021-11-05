@@ -33,10 +33,22 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
     private AuthenticationManager authenticationManager;
 
     /**
+     * 因为common有这个bean对象了 我就不需要了
+     *
+     * @return
+     */
+//    @Bean
+    public TokenStore tokenStore(){
+        return new JwtTokenStore(jwtAccessTokenConverter());
+    }
+
+
+
+    /**
      * 非对称加密
      * @return
      */
-    @Bean
+//    @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
         ClassPathResource resource = new ClassPathResource("cxs-jwt.jks");
@@ -76,11 +88,6 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
         endpoints.tokenStore(tokenStore())
                 .accessTokenConverter(jwtAccessTokenConverter())
                 .authenticationManager(authenticationManager);
-    }
-
-    @Bean
-    public TokenStore tokenStore(){
-        return new JwtTokenStore(jwtAccessTokenConverter());
     }
 
 
