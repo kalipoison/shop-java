@@ -6,6 +6,7 @@
     <modules>
         <module>cloud-iaas</module>
         <module>shop-common</module>
+        <module>shop-manager</module>
     </modules>
 
     <parent>
