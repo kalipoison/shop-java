@@ -4,6 +4,7 @@ import com.gohb.domain.SysMenu;
 import com.gohb.service.SysMenuService;
 import com.gohb.vo.MenuAndAuths;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,6 +33,7 @@ public class MenuController {
      * @return
      */
     @GetMapping("nav")
+    @ApiOperation(value = "加载用户菜单和权限的接口")
     public ResponseEntity<MenuAndAuths> loadMenuAndAuths(){
         // 获取当前用户id
         String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();

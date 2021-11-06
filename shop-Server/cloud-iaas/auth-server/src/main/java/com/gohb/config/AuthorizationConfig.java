@@ -32,6 +32,7 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+
     /**
      * 因为common有这个bean对象了 我就不需要了
      *
@@ -51,9 +52,13 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
 //    @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+        // 把私钥读到内存中
         ClassPathResource resource = new ClassPathResource("cxs-jwt.jks");
+        // 创建一个钥匙工厂
         KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(resource, "cxs123".toCharArray());
+        // 拿到钥匙
         KeyPair keyPair = keyStoreKeyFactory.getKeyPair("cxs-jwt");
+        // 设置进转换器里面
         jwtAccessTokenConverter.setKeyPair(keyPair);
         return jwtAccessTokenConverter;
     }
@@ -89,8 +94,6 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
                 .accessTokenConverter(jwtAccessTokenConverter())
                 .authenticationManager(authenticationManager);
     }
-
-
 
 
 }

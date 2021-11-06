@@ -36,7 +36,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         List<SysMenu> sysMenus = null;
         String menuStr = redisTemplate.opsForValue().get(MenuConstant.MENU_PREFIX + userId);
         if (StringUtils.isEmpty(menuStr)){
-            sysMenus = sysMenuMapper.findMenuByUserId(Long.valueOf(menuStr));
+            sysMenus = sysMenuMapper.findMenuByUserId(Long.valueOf(userId));
             if (CollectionUtils.isEmpty(sysMenus)){
                 // 说明该用户没有任何菜单
                 return Collections.emptyList();
