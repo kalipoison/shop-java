@@ -2,6 +2,7 @@ package com.gohb.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gohb.anoo.Log;
 import com.gohb.domain.SysUser;
 import com.gohb.service.SysUserService;
 import io.swagger.annotations.Api;
@@ -29,6 +30,7 @@ public class SysUserController {
      */
     @GetMapping("info")
     @ApiOperation(value = "查询当前登录用户的信息")
+    @Log(operation = "查询当前登录用户的信息")
     public ResponseEntity<SysUser> getUserInfo() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         SysUser sysUser = sysUserService.getById(userId);
@@ -38,6 +40,7 @@ public class SysUserController {
     @GetMapping("page")
     @ApiOperation(value = "分页查询管理员列表")
     @PreAuthorize("hasAuthority('sys:user:page')")
+    @Log(operation = "分页查询管理员列表")
     public ResponseEntity<IPage<SysUser>> getSysUserPage(Page<SysUser> page, SysUser sysUser){
         IPage<SysUser> sysUserIPage = sysUserService.findSysUserByPage(page, sysUser);
         return ResponseEntity.ok(sysUserIPage);

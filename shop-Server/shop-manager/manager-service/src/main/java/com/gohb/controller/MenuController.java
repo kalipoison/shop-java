@@ -1,5 +1,6 @@
 package com.gohb.controller;
 
+import com.gohb.anoo.Log;
 import com.gohb.domain.SysMenu;
 import com.gohb.service.SysMenuService;
 import com.gohb.vo.MenuAndAuths;
@@ -34,6 +35,7 @@ public class MenuController {
      */
     @GetMapping("nav")
     @ApiOperation(value = "加载用户菜单和权限的接口")
+    @Log(operation = "加载用户菜单和权限的接口")
     public ResponseEntity<MenuAndAuths> loadMenuAndAuths(){
         // 获取当前用户id
         String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
