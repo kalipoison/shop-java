@@ -1,4 +1,4 @@
-package com.gohb.anoo;
+package com.gohb.anno;
 
 import java.lang.annotation.*;
 

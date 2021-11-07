@@ -3,7 +3,7 @@ package com.gohb.aspect;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.gohb.anoo.Log;
+import com.gohb.anno.Log;
 import com.gohb.domain.SysLog;
 import com.gohb.domain.SysUser;
 import com.gohb.service.SysLogService;
@@ -40,7 +40,7 @@ public class LogAspect {
      * @param joinPoint
      * @return
      */
-    @Around(value = "@annotation(com.whsxt.anno.Log)")
+    @Around(value = "@annotation(com.gohb.anno.Log)")
     public Object myLogAspect(ProceedingJoinPoint joinPoint) {
         // 记录用户的操作
         Object result = null;
