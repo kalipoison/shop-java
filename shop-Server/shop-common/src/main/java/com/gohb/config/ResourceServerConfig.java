@@ -86,6 +86,5 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .and()
                 .headers()
                 .cacheControl(); // 控制请求头的缓存
-        super.configure(http);
     }
 }
