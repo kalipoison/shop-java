@@ -2,7 +2,7 @@ package com.gohb.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gohb.anoo.Log;
+import com.gohb.anno.Log;
 import com.gohb.domain.SysUser;
 import com.gohb.service.SysUserService;
 import io.swagger.annotations.Api;
@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "后台用户的接口")
 @RestController
@@ -44,6 +42,16 @@ public class SysUserController {
     public ResponseEntity<IPage<SysUser>> getSysUserPage(Page<SysUser> page, SysUser sysUser){
         IPage<SysUser> sysUserIPage = sysUserService.findSysUserByPage(page, sysUser);
         return ResponseEntity.ok(sysUserIPage);
+    }
+
+    @PostMapping
+    @ApiOperation("新增用户")
+    public ResponseEntity<Void> saveSysUser(@RequestBody SysUser sysUser) {
+        // 拿到当前用户的id
+        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        sysUser.setCreateUserId(Long.valueOf(userId));
+        sysUserService.save(sysUser);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -61,7 +61,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         List<SysMenu> root = sysMenus.stream()
                 .filter(sysMenu -> sysMenu.getParentId().equals(pid))
                 .collect(Collectors.toList());
-        root.forEach(r->{
+        root.stream().forEach(r->{
             List<SysMenu> child = sysMenus.stream()
                     .filter(sysMenu -> sysMenu.getParentId().equals(r.getMenuId())).collect(Collectors.toList());
             r.setList(child);
