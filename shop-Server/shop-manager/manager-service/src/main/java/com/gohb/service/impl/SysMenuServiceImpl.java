@@ -31,7 +31,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Override
     public List<SysMenu> loadUserMenu(String userId) {
-        log.info("加载树菜单");
+        log.info("加载菜单数据");
         // 从缓存里面拿
         List<SysMenu> sysMenus = null;
         String menuStr = redisTemplate.opsForValue().get(MenuConstant.MENU_PREFIX + userId);

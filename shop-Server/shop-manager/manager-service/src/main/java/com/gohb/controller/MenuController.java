@@ -1,6 +1,9 @@
 package com.gohb.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gohb.anno.Log;
+import com.gohb.constant.MenuConstant;
 import com.gohb.domain.SysMenu;
 import com.gohb.service.SysMenuService;
 import com.gohb.vo.MenuAndAuths;
@@ -9,12 +12,13 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,13 +64,13 @@ public class MenuController {
     @PreAuthorize("hasAuthority('sys:menu:list')")
     public ResponseEntity<List<SysMenu>> loadAllMenuList() {
         List<SysMenu> sysMenus = null;
-        if (redisTemplate.hasKey(ManagerConstant.MENU)) {
-            String menuStr = redisTemplate.opsForValue().get(ManagerConstant.MENU);
+        if (redisTemplate.hasKey(MenuConstant.MENU_PREFIX)) {
+            String menuStr = redisTemplate.opsForValue().get(MenuConstant.MENU_PREFIX);
             sysMenus = JSON.parseArray(menuStr, SysMenu.class);
         } else {
             sysMenus = sysMenuService.list();
             String menuStr = JSON.toJSONString(sysMenus);
-            redisTemplate.opsForValue().set(ManagerConstant.MENU, menuStr, Duration.ofDays(1));
+            redisTemplate.opsForValue().set(MenuConstant.MENU_PREFIX, menuStr, Duration.ofDays(1));
         }
         return ResponseEntity.ok(sysMenus);
     }
@@ -88,6 +92,7 @@ public class MenuController {
         sysMenuService.save(sysMenu);
         return ResponseEntity.ok().build();
     }
+
     @ApiOperation("删除一个菜单")
     @PreAuthorize("hasAuthority('sys:menu:delete')")
     @DeleteMapping("/{id}")
@@ -95,6 +100,8 @@ public class MenuController {
         sysMenuService.removeById(id);
         return ResponseEntity.ok().build();
     }
+
+
     @ApiOperation("菜单数据的回显")
     @PreAuthorize("hasAuthority('sys:menu:info')")
     @GetMapping("/info/{id}")
