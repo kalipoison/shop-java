@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gohb.constant.SysUserConstant;
 import com.gohb.domain.SysRole;
 import com.gohb.domain.SysUser;
 import com.gohb.domain.SysUserRole;
@@ -14,11 +15,13 @@ import com.gohb.service.SysUserRoleService;
 import com.gohb.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,25 +31,31 @@ import java.util.List;
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
     @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
     private SysUserMapper sysUserMapper;
 
     @Autowired
     private SysUserRoleService sysUserRoleService;
 
-    /**
-     * 分页查询管理员列表
-     *
-     * @param page
-     * @param sysUser
-     * @return
-     */
     @Override
-    public IPage<SysUser> findSysUserByPage(Page<SysUser> page, SysUser sysUser) {
-        page.addOrder(OrderItem.desc("create_time"));
-        return sysUserMapper.selectPage(page, new LambdaQueryWrapper<SysUser>()
-                .like(StringUtils.hasText(sysUser.getUsername()), SysUser::getUsername, sysUser.getUsername())
-                .eq(sysUser.getStatus() != null, SysUser::getStatus, sysUser.getStatus()));
+    public SysUser getById(Serializable id) {
+        SysUser sysUser = null;
+        String sysUserStr = redisTemplate.opsForValue().get(SysUserConstant.SYS_USER_PREFIX + id);
+        if (StringUtils.isEmpty(sysUserStr)) {
+            //缓存无
+            sysUser = super.getById(id);
+            //放缓存
+            redisTemplate.opsForValue().set(SysUserConstant.SYS_USER_PREFIX + id,
+                    JSON.toJSONString(sysUser));
+        } else {
+            //缓存有
+            sysUser = JSON.parseObject(sysUserStr, SysUser.class);
+        }
+        return sysUser;
     }
+
 
     /**
      * 新增用户
