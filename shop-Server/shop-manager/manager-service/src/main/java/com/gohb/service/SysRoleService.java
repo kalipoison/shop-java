@@ -5,18 +5,25 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gohb.domain.SysRole;
 import com.gohb.domain.SysUser;
+import com.gohb.vo.SysRoleVo;
 
 import java.util.List;
 
 public interface SysRoleService extends IService<SysRole> {
 
     /**
-     * 分页查询角色列表
+     * 新增角色和权限
      *
-     * @param page
-     * @param sysRole
+     * @param sysRoleVo
+     * @param userId
+     */
+    void saveRoleAndMenu(SysRoleVo sysRoleVo, Long userId);
+
+    /**
+     * 更新角色
+     *
+     * @param sysRoleVo
      * @return
      */
-    IPage<SysRole> findSysUserByPage(Page<SysRole> page, SysRole sysRole);
-
+    boolean updateByRoleId(SysRoleVo sysRoleVo);
 }
