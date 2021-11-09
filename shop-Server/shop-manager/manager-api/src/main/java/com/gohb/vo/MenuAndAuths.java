@@ -15,10 +15,10 @@ import java.util.List;
 @ApiModel
 public class MenuAndAuths {
 
-    @ApiModelProperty(value = "树菜单")
+    @ApiModelProperty(value = "菜单数据")
     private List<SysMenu> menuList;
 
-    @ApiModelProperty(value = "权限")
+    @ApiModelProperty(value = "用户的权限数据")
     private List<String> authorities;
 
 

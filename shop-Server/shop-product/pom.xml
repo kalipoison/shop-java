@@ -9,15 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cloud-iaas</artifactId>
+    <artifactId>shop-product</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>eureka-server</module>
-        <module>config-server</module>
-        <module>gateway</module>
-        <module>admin-server</module>
-        <module>auth-server</module>
+        <module>product-api</module>
+        <module>product-service</module>
     </modules>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
 
 </project>

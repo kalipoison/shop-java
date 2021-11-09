@@ -77,6 +77,9 @@ public class SysMenu implements Serializable {
     private Integer orderNum;
 
 
+    /**
+     * 菜单树
+     */
     @TableField(exist = false)
     @ApiModelProperty(value = "子节点")
     private List<SysMenu> list;
