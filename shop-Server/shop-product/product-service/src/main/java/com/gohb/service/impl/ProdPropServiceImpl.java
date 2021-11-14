@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,6 @@ public class ProdPropServiceImpl extends ServiceImpl<ProdPropMapper, ProdProp> i
     @Autowired
     private ProdPropMapper prodPropMapper;
 
-
     @Autowired
     private ProdPropValueMapper prodPropValueMapper;
 
@@ -38,36 +39,34 @@ public class ProdPropServiceImpl extends ServiceImpl<ProdPropMapper, ProdProp> i
 
     /**
      * 分页查询商品的属性和属性值
-     *
      * @param page
      * @param prodProp
      * @return
      */
     @Override
     public IPage<ProdProp> findProdPropPage(Page<ProdProp> page, ProdProp prodProp) {
-        // 分页查询所有的属性
+        // 分页查询所有属性
         Page<ProdProp> prodPropPage = prodPropMapper.selectPage(page, new LambdaQueryWrapper<ProdProp>()
                 .like(StringUtils.hasText(prodProp.getPropName()), ProdProp::getPropName, prodProp.getPropName())
         );
         // 拿到当前页的数据
         List<ProdProp> prodPropList = prodPropPage.getRecords();
-        // 属性都没有 直接返回了
-        if (CollectionUtils.isEmpty(prodPropList)) {
+        // 没有一条属性
+        if (CollectionUtils.isEmpty(prodPropList)){
             prodPropPage.setRecords(Collections.emptyList());
             return prodPropPage;
         }
-        // 拿到所有的属性id  属性  80 81  和属性值 384 385 386 387 388 389 是一对多的关系
-        // 拿到所有的属性的ids
+        // 拿到所有属性的id， 属性和属性值是 一对多的关系
+        // 拿到所有属性的ids
         List<Long> prodPropIds = prodPropList.stream()
                 .map(ProdProp::getPropId)
                 .collect(Collectors.toList());
-        // 根据ids 查询所有的属性值的集合
-        List<ProdPropValue> prodPropValues = prodPropValueMapper.selectList(new LambdaQueryWrapper<ProdPropValue>()
-                .in(ProdPropValue::getPropId, prodPropIds)
+        // 根据所有的ids 查询所有属性值的集合
+        List<ProdPropValue> prodPropValues = prodPropValueMapper.selectList(
+                new LambdaQueryWrapper<ProdPropValue>()
+                        .in(ProdPropValue::getPropId, prodPropIds)
         );
-        // 在java代码里面循环组装数据
         prodPropList.forEach(pp -> {
-            // 判断条件
             List<ProdPropValue> propValues = prodPropValues.stream()
                     .filter(prodPropValue -> prodPropValue.getPropId().equals(pp.getPropId()))
                     .collect(Collectors.toList());
@@ -77,33 +76,18 @@ public class ProdPropServiceImpl extends ServiceImpl<ProdPropMapper, ProdProp> i
     }
 
     /**
-     * 根据查询商品的属性id查询属性值集合
+     * 新增属性和属性值
      *
-     * @param id
+     * @param prodProp
      * @return
      */
     @Override
-    public List<ProdPropValue> findPropValuesByPropId(Long id) {
-        return prodPropValueMapper.selectList(new LambdaQueryWrapper<ProdPropValue>()
-                .eq(ProdPropValue::getPropId, id)
-        );
-    }
-
-
-    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public boolean save(ProdProp prodProp) {
-        // 操作两个表
         log.info("新增商品的属性和属性值{}", JSON.toJSONString(prodProp));
-        // 新增属性表
-        prodProp.setShopId(1L);
-        prodProp.setRule(2);
-        // 新增
         int insert = prodPropMapper.insert(prodProp);
         if (insert > 0) {
-            // 新增属性值
             List<ProdPropValue> prodPropValues = prodProp.getProdPropValues();
-            // 循环这个属性值的集合 统一设置id
             prodPropValues.forEach(prodPropValue -> prodPropValue.setPropId(prodProp.getPropId()));
             // 操作数据库
             prodPropValueService.saveBatch(prodPropValues);
@@ -111,25 +95,49 @@ public class ProdPropServiceImpl extends ServiceImpl<ProdPropMapper, ProdProp> i
         return insert > 0;
     }
 
+
+
+    /**
+     * 根据查询商品的属性id查询属性值集合
+     *
+     * @param id
+     * @return
+     */
     @Override
-    public List<ProdProp> list() {
-        // 查到属性 还要查到属性值
-        List<ProdProp> prodProps = prodPropMapper.selectList(null);
-        // 查询属性值
-        List<Long> propIds = prodProps.stream()
-                .map(ProdProp::getPropId)
-                .collect(Collectors.toList());
-        // 查询属性值表
-        List<ProdPropValue> prodPropValueList = prodPropValueMapper.selectList(new LambdaQueryWrapper<ProdPropValue>()
-                .in(ProdPropValue::getPropId, propIds)
+    public List<ProdPropValue> findPropValuesByPropId(Long id) {
+        List<ProdPropValue> prodPropValues = prodPropValueMapper.selectList(new
+                LambdaQueryWrapper<ProdPropValue>()
+                .eq(ProdPropValue::getPropId, id)
         );
-        // 根据属性的ids 查询到属性值的集合 然后循环属性 判断属性值 组装数据
-        prodProps.forEach(prodProp -> {
-            List<ProdPropValue> prodPropValues = prodPropValueList.stream()
-                    .filter(prodPropValue -> prodPropValue.getPropId().equals(prodProp.getPropId()))
-                    .collect(Collectors.toList());
-            prodProp.setProdPropValues(prodPropValues);
-        });
-        return prodProps;
+        return prodPropValues;
+    }
+
+    /**
+     * 根据商品id 删除商品的属性和属性值集合
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public boolean removeById(Serializable id) {
+        int remove = prodPropMapper.deleteById(id);
+        if (remove > 0){
+            prodPropValueMapper.delete(new LambdaQueryWrapper<ProdPropValue>()
+                .eq(ProdPropValue::getPropId, id));
+        }
+        return remove > 0;
+    }
+
+    @Override
+    public boolean updateById(ProdProp prodProp) {
+        int update = prodPropMapper.updateById(prodProp);
+        if (update > 0) {
+            List<ProdPropValue> prodPropValues = prodProp.getProdPropValues();
+            // 更新时，可能插入新的数据prodPropValue，此时没有 prodId
+            prodPropValues.forEach(prodPropValue ->
+                    prodPropValue.setPropId(prodProp.getPropId()));
+            prodPropValueService.saveOrUpdateBatch(prodPropValues);
+        }
+        return update > 0;
     }
 }

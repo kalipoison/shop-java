@@ -22,7 +22,7 @@ public interface ProdPropService extends IService<ProdProp> {
     IPage<ProdProp> findProdPropPage(Page<ProdProp> page, ProdProp prodProp);
 
     /**
-     * 根据查询商品的属性id查询属性值集合
+     * 属性值的回显
      *
      * @param id
      * @return
