@@ -12,19 +12,12 @@ public interface ProdTagService extends IService<ProdTag> {
 
 
     /**
-     * 商品标签的分页查询
+     * 分页查询商品标签（分组）
      *
      * @param page
      * @param prodTag
      * @return
      */
-    IPage<ProdTag> findProdTagPage(Page<ProdTag> page, ProdTag prodTag);
-
-    /**
-     * 加载前台的标签分组
-     *
-     * @return
-     */
-    List<ProdTagVo> findProdTagVo();
+    IPage<ProdTag> findProdByPage(Page<ProdTag> page, ProdTag prodTag);
 
 }
