@@ -67,7 +67,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
             @CacheEvict(key = ProductConstant.SUB_CATEGORIES)
     })
     public boolean save(Category category) {
-        log.info("新增一个分类开始,名称为{}", category.getCategoryName());
+        log.info("新增一个分类开始,名称为{}", JSON.toJSON(category));
         //校验
         validate(category);
         category.setRecTime(new Date());
@@ -135,7 +135,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     /**
-     * 更新一个分类清空缓存
+     * 删除所有相关缓存
      *
      * @param entity
      * @return
