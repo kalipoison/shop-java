@@ -46,6 +46,7 @@ public class ProdController {
         prodService.removeById(id);
         return ResponseEntity.ok().build();
     }
+
     @DeleteMapping
     @ApiOperation("删除多个商品")
     @PreAuthorize("hasAuthority('prod:prod:delete')")

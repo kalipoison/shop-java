@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +42,9 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
     private SkuService skuService;
 
     @Autowired
+    private SkuMapper skuMapper;
+
+    @Autowired
     private ProdTagReferenceMapper prodTagReferenceMapper;
 
     @Autowired
@@ -51,7 +55,9 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
 
     /**
      * 分页查询商品
-     *
+     * Prod
+     * Sku
+     * tag_reference
      * @param page
      * @param prod
      * @return
@@ -59,10 +65,28 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
     @Override
     public IPage<Prod> findProdPage(Page<Prod> page, Prod prod) {
         page.addOrder(OrderItem.desc("create_time"));
-        return prodMapper.selectPage(page, new LambdaQueryWrapper<Prod>()
+        // 查看分页商品
+        Page<Prod> prodPage = prodMapper.selectPage(page, new LambdaQueryWrapper<Prod>()
                 .eq(prod.getStatus() != null, Prod::getStatus, prod.getStatus())
                 .like(StringUtils.hasText(prod.getProdName()), Prod::getProdName, prod.getProdName())
-            );
+        );
+        return prodPage;
+    }
+
+    @Override
+    public Prod getById(Serializable prodId) {
+        Prod prod = prodMapper.selectById(prodId);
+        List<Sku> skus = skuMapper.selectList(new LambdaQueryWrapper<Sku>()
+            .eq(Sku::getProdId, prodId)
+        );
+        prod.setSkuList(skus);
+        List<ProdTagReference> prodTagReferenceList = prodTagReferenceMapper
+                .selectList(new LambdaQueryWrapper<ProdTagReference>()
+                    .eq(ProdTagReference::getProdId, prodId)
+                );
+        List<Long> tagList = prodTagReferenceList.stream().map(ProdTagReference::getTagId).collect(Collectors.toList());
+        prod.setTagList(tagList);
+        return prod;
     }
 
     /**
@@ -109,6 +133,35 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
             handlerTagReference(prod.getTagList(), prod.getProdId());
         }
         return insert > 0;
+    }
+
+    @Override
+    public boolean updateById(Prod prod) {
+        removeById(prod.getProdId());
+        boolean insert = save(prod);
+        return insert;
+    }
+
+    /**
+     * 商品删除需要操作三张表
+     * Prod
+     * Sku
+     * tag_reference
+     * @param prodId
+     * @return
+     */
+    @Override
+    public boolean removeById(Serializable prodId) {
+        int delete = prodMapper.deleteById(prodId);
+        if (delete > 0){
+            skuService.remove(new LambdaQueryWrapper<Sku>()
+                    .eq(Sku::getProdId, prodId)
+            );
+            prodTagReferenceService.remove(new LambdaQueryWrapper<ProdTagReference>()
+                .eq(ProdTagReference::getProdId, prodId)
+            );
+        }
+        return delete > 0;
     }
 
     /**
