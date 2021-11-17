@@ -65,7 +65,7 @@ public class ProdController {
     @ApiOperation("修改一个商品")
     @PreAuthorize("hasAuthority('prod:prod:update')")
     public ResponseEntity<Void> update(@RequestBody @Validated Prod prod) {
-        this.prodService.updateById(prod);
+        prodService.updateById(prod);
         return ResponseEntity.ok().build();
     }
 
