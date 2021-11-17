@@ -29,6 +29,8 @@ public class ProdEs {
     // 更新时间
     // 库存
     // 标签
+    // 好评数
+    // 好评率
 
     @Id
     @Field

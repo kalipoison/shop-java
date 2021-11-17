@@ -176,7 +176,7 @@ public class Prod implements Serializable {
 
     @Data
     @ApiModel("配送方式")
-    public static class DeliverModeVo implements Serializable{
+    public static class DeliverModeVo implements Serializable   {
 
         @ApiModelProperty(value = "用户自提")
         private Boolean hasUserPickUp;
