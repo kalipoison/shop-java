@@ -10,7 +10,6 @@ import java.util.Map;
 
 public interface ProdService extends IService<Prod> {
 
-
     /**
      * 分页查询商品
      *
@@ -21,7 +20,7 @@ public interface ProdService extends IService<Prod> {
     IPage<Prod> findProdPage(Page<Prod> page, Prod prod);
 
     /**
-     * 根据区间查询商品的总条数
+     * 查询时间段内的商品总条数
      *
      * @param t1
      * @param t2
@@ -30,7 +29,7 @@ public interface ProdService extends IService<Prod> {
     Integer getTotalCount(Date t1, Date t2);
 
     /**
-     * 分页查询需要导入的商品
+     * 分页查询商品数据导入es 的
      *
      * @param page
      * @param t1
@@ -39,18 +38,4 @@ public interface ProdService extends IService<Prod> {
      */
     Page<Prod> findProdByPageToEs(Page<Prod> page, Date t1, Date t2);
 
-    /**
-     * 前台根据id查询商品的信息（包括了sku）
-     *
-     * @param prodId
-     * @return
-     */
-    Prod findProdAndSkuById(Long prodId);
-
-    /**
-     * 修改库存的方法
-     *
-     * @param stockMap
-     */
-    void changeStock(Map<String, Map<Long, Integer>> stockMap);
 }

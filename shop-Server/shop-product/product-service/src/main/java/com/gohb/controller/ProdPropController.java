@@ -70,6 +70,7 @@ public class ProdPropController {
         List<ProdProp> list = prodPropService.list();
         return ResponseEntity.ok(list);
     }
+
     @GetMapping({"/listSpecValue/{id}"})
     @PreAuthorize("hasAuthority('prod:spec:info')")
     @ApiOperation("根据查询商品的属性id查询属性值集合")

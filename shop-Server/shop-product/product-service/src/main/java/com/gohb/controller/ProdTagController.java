@@ -74,7 +74,7 @@ public class ProdTagController {
     @ApiOperation("列出所有的商品标签的列表")
     @PreAuthorize("hasAuthority('prod:prodTag:info')")
     public ResponseEntity<List<ProdTag>> list() {
-        List<ProdTag> list = this.prodTagService.list();
+        List<ProdTag> list = prodTagService.list();
         return ResponseEntity.ok(list);
     }
 

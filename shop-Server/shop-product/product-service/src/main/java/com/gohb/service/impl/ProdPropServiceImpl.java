@@ -140,4 +140,40 @@ public class ProdPropServiceImpl extends ServiceImpl<ProdPropMapper, ProdProp> i
         }
         return update > 0;
     }
+
+
+    @Override
+    public List<ProdProp> list() {
+        // 查到属性 还要查到属性值
+        List<ProdProp> prodProps = prodPropMapper.selectList(null);
+        // 查询属性值
+        List<Long> prodIds = prodProps.stream().map(ProdProp::getPropId)
+                            .collect(Collectors.toList());
+        // 查询属性值表
+        List<ProdPropValue> prodPropValueList = prodPropValueMapper.selectList(new LambdaQueryWrapper<ProdPropValue>()
+                .in(ProdPropValue::getPropId, prodIds));
+        // 根据属性的ids 查询到属性值的集合 然后循环属性 判断属性值 组装数据
+        prodProps.forEach(prodProp -> {
+            List<ProdPropValue> prodPropValues = prodPropValueList.stream()
+                    .filter(prodPropValue -> prodPropValue.getPropId().equals(prodProp.getPropId()))
+                    .collect(Collectors.toList());
+            prodProp.setProdPropValues(prodPropValues);
+        });
+
+//        List<Long> propIds = prodProps.stream()
+//                .map(ProdProp::getPropId)
+//                .collect(Collectors.toList());
+//        // 查询属性值表
+//        List<ProdPropValue> prodPropValueList = prodPropValueMapper.selectList(new LambdaQueryWrapper<ProdPropValue>()
+//                .in(ProdPropValue::getPropId, propIds)
+//        );
+//        // 根据属性的ids 查询到属性值的集合 然后循环属性 判断属性值 组装数据
+//        prodProps.forEach(prodProp -> {
+//            List<ProdPropValue> prodPropValues = prodPropValueList.stream()
+//                    .filter(prodPropValue -> prodPropValue.getPropId().equals(prodProp.getPropId()))
+//                    .collect(Collectors.toList());
+//            prodProp.setProdPropValues(prodPropValues);
+//        });
+        return prodProps;
+    }
 }

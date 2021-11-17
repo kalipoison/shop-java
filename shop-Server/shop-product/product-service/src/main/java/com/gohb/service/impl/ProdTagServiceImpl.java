@@ -55,7 +55,26 @@ public class ProdTagServiceImpl extends ServiceImpl<ProdTagMapper, ProdTag> impl
         return prodTagIPage;
     }
 
+    /**
+     * 商品标签列表
+     * @return
+     */
     @Override
+    @Cacheable(key = ProdTagConstant.PROD_TAG_PREFIX)
+    public List<ProdTag> list() {
+        List<ProdTag> prodTags = prodTagMapper.selectList(new LambdaQueryWrapper<ProdTag>()
+                .eq(ProdTag::getStatus, 1)
+        );
+        return prodTags;
+    }
+
+    /**
+     * 新增商品标签
+     * @param prodTag
+     * @return
+     */
+    @Override
+    @CacheEvict(key = ProdTagConstant.PROD_TAG_PREFIX)
     public boolean save(ProdTag prodTag) {
         log.info("新增商品标签{}", JSON.toJSONString(prodTag));
         // 设置一些默认值

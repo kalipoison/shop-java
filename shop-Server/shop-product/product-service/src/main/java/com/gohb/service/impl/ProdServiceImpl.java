@@ -15,6 +15,7 @@ import com.gohb.service.ProdService;
 import com.gohb.service.ProdTagReferenceService;
 import com.gohb.service.SkuService;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,7 +46,6 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
     @Autowired
     private ProdCommMapper prodCommMapper;
 
-
     @Autowired
     private ProdTagReferenceService prodTagReferenceService;
 
@@ -62,16 +62,14 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
         return prodMapper.selectPage(page, new LambdaQueryWrapper<Prod>()
                 .eq(prod.getStatus() != null, Prod::getStatus, prod.getStatus())
                 .like(StringUtils.hasText(prod.getProdName()), Prod::getProdName, prod.getProdName())
-        );
+            );
     }
 
-
     /**
-     * 商品新增 需要写三张表
+     * 商品新增需要操作三张表
      * Prod
      * Sku
      * tag_reference
-     *
      * @param prod
      * @return
      */
@@ -81,21 +79,31 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
         log.info("新增商品{}", JSON.toJSONString(prod));
         prod.setCreateTime(new Date());
         prod.setUpdateTime(new Date());
-        if (prod.getStatus().equals(1)) {
-            prod.setPutawayTime(new Date());
-        }
+        prod.setPutawayTime(prod.getStatus() == 1 ? new Date() : null); // 上架时间
         prod.setSoldNum(0);
-        prod.setShopId(1L);
         // 配送方式
-        Prod.DeliverModeVo deliverModeVo = prod.getDeliveryModeVo();
-        String deliverStr = JSON.toJSONString(deliverModeVo);
+        Prod.DeliverModeVo deliveryModeVo = prod.getDeliveryModeVo();
+        String deliverStr = JSON.toJSONString(deliveryModeVo);
         prod.setDeliveryMode(deliverStr);
+
+        //设置prod 库存
+        List<Sku> skuList = prod.getSkuList();
+        //规约
+        Integer reduce = skuList.stream().map(Sku::getStocks).reduce(0, Integer::sum);
+        // List<Integer> 500 900 600
+        // Integer reduce = skuList.stream().map(Sku::getStocks).reduce(0, (x, y) -> x + y);
+        log.info("规约",reduce);
+        Integer prodStock = 0;
+        //流式操作不能使用非原子性操作atomic
+        for (Sku sku : skuList) {
+            prodStock += sku.getStocks();
+        }
+        prod.setTotalStocks(prodStock);
+
         // 插入数据库
         int insert = prodMapper.insert(prod);
         if (insert > 0) {
             // 操作Sku
-            Sku sku = prod.getSkuList().get(0);
-            sku.setActualStocks(prod.getTotalStocks());
             handlerSku(prod.getSkuList(), prod.getProdId());
             // 操作tag_reference
             handlerTagReference(prod.getTagList(), prod.getProdId());
@@ -105,51 +113,45 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
 
     /**
      * 处理商品和标签的中间表
-     *
      * @param tagList
      * @param prodId
      */
     private void handlerTagReference(List<Long> tagList, Long prodId) {
-        if (CollectionUtils.isEmpty(tagList)) {
+        if (CollectionUtils.isEmpty(tagList)){
             return;
         }
-        ArrayList<ProdTagReference> prodTagReferences = new ArrayList<>(tagList.size() * 2);
+        List<ProdTagReference> prodTagReferences = new ArrayList<>(tagList.size() * 2);
         tagList.forEach(tag -> {
             ProdTagReference prodTagReference = new ProdTagReference();
             prodTagReference.setProdId(prodId);
             prodTagReference.setTagId(tag);
             prodTagReference.setCreateTime(new Date());
             prodTagReference.setStatus(Boolean.TRUE);
-            prodTagReference.setShopId(1L);
             prodTagReferences.add(prodTagReference);
         });
-
         // 插入数据库
         prodTagReferenceService.saveBatch(prodTagReferences);
     }
 
     /**
-     * 处理商品和sku的关系
-     *
+     * 处理商品与sku的关系
      * @param skuList
      * @param prodId
      */
     private void handlerSku(List<Sku> skuList, Long prodId) {
         skuList.forEach(sku -> {
-            sku.setRecTime(new Date());
-            sku.setUpdateTime(new Date());
-            sku.setIsDelete(0);
             sku.setProdId(prodId);
-            sku.setVersion(0);
+            sku.setUpdateTime(new Date());
+            sku.setRecTime(new Date());
+            sku.setVersion(1);
         });
-        // 插入sku的数据库
+        // 插入sku 数据库
         skuService.saveBatch(skuList);
     }
-    // ------------------------------- 导入的代码
 
-
+    // -----------------------导入ES操作
     /**
-     * 根据区间查询商品的总条数
+     * 查询时间段内的商品总条数
      *
      * @param t1
      * @param t2
@@ -162,7 +164,6 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
         );
         return count;
     }
-
 
     /**
      * 分页查询需要导入的商品
@@ -181,54 +182,44 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
         Page<Prod> prodPage = prodMapper.selectPage(page, new LambdaQueryWrapper<Prod>()
                 .between(t1 != null && t2 != null, Prod::getUpdateTime, t1, t2)
         );
-
         List<Prod> prodList = prodPage.getRecords();
-
-        if (CollectionUtils.isEmpty(prodList)) {
+        if (CollectionUtils.isEmpty(prodList)){
             return prodPage;
         }
-        //  1. 处理标签
-        // 拿到商品ids
-        List<Long> prodIds = prodList.stream()
-                .map(Prod::getProdId)
-                .collect(Collectors.toList());
+        // 1. 处理标签
+        // 拿到商品的ids
+        List<Long> prodIds = prodList.stream().map(Prod::getProdId).collect(Collectors.toList());
         // 查询标签表
         List<ProdTagReference> tagReferenceList = prodTagReferenceMapper.selectList(new LambdaQueryWrapper<ProdTagReference>()
                 .in(ProdTagReference::getProdId, prodIds)
         );
-        // 循环组装数据
+        // 循环组织数据
         prodList.forEach(prod -> {
-            List<ProdTagReference> referenceList = tagReferenceList.stream()
-                    .filter(tag -> tag.getProdId().equals(prod.getProdId()))
-                    .collect(Collectors.toList());
-            // 拿到tagId的list
-            List<Long> tagList = referenceList.stream()
-                    .map(ProdTagReference::getTagId)
-                    .collect(Collectors.toList());
+            List<ProdTagReference> referenceList = tagReferenceList.stream().filter(tag -> tag.getProdId()
+                    .equals(prod.getProdId())).collect(Collectors.toList());
+            List<Long> tagList = referenceList.stream().map(ProdTagReference::getTagId).collect(Collectors.toList());
             prod.setTagList(tagList);
         });
         // 2. 处理好评和好评率
-        // 查询评论表
         List<ProdComm> prodCommList = prodCommMapper.selectList(new LambdaQueryWrapper<ProdComm>()
                 .in(ProdComm::getProdId, prodIds)
         );
-        // 得到总评的数量的
+        // 得到好评数和总评数
         prodList.forEach(prod -> {
             Boolean flag = true;
-            // 拿到这个商品的总评数量
-            List<ProdComm> totalComm = prodCommList.stream()
-                    .filter(prodComm -> prodComm.getProdId().equals(prod.getProdId()))
-                    .collect(Collectors.toList());
-            if (!CollectionUtils.isEmpty(totalComm)) {
-                // 有总评数量
-                List<ProdComm> goodsComm = totalComm.stream()
-                        .filter(prodComm -> prodComm.getEvaluate().equals(0))
-                        .collect(Collectors.toList());
-                if (!CollectionUtils.isEmpty(goodsComm)) {
+            // 拿到这个商品的总评数
+            List<ProdComm> totalComm = prodCommList.stream().filter(prodComm -> prodComm.getProdId()
+                    .equals(prod.getProdId())).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(totalComm)){
+                // 有总评数
+                List<ProdComm> goodsComm = totalComm.stream().filter(prodComm -> prodComm.getEvaluate()
+                        .equals(0)).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(goodsComm)){
+                    // 有好评
                     flag = false;
-                    // 计算好评数
+                    // 好评数
                     int goodsSize = goodsComm.size();
-                    // 计算总评数
+                    // totalComm
                     int totalSize = totalComm.size();
                     // 转换
                     BigDecimal goodsSizeBigDecimal = new BigDecimal(goodsSize);
@@ -251,70 +242,5 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
         return prodPage;
     }
 
-    /**
-     * 前台根据id查询商品的信息（包括了sku）
-     *
-     * @param prodId
-     * @return
-     */
-    @Override
-    @Cacheable(key = "#prodId")
-    public Prod findProdAndSkuById(Long prodId) {
-        // 查询数据库
-        Prod prod = prodMapper.selectById(prodId);
-        if (ObjectUtils.isEmpty(prod)) {
-            return null;
-        }
-        // 如果有商品 查询sku的集合
-        List<Sku> list = skuService.list(new LambdaQueryWrapper<Sku>()
-                .eq(Sku::getProdId, prod.getProdId())
-        );
-        prod.setSkuList(list);
-        return prod;
-    }
 
-    /**
-     * 修改库存的方法
-     * 操作两个表
-     *
-     * @param stockMap
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void changeStock(Map<String, Map<Long, Integer>> stockMap) {
-        // 拿到prod
-        Map<Long, Integer> prodStock = stockMap.get("prod");
-        // 先把匹配的的prod查出来
-        Set<Long> prodIds = prodStock.keySet();
-        List<Prod> prodList = prodMapper.selectBatchIds(prodIds);
-        // 在代码中循环 修改库存 最后更新
-        prodList.forEach(prod -> {
-            Integer stock = prodStock.get(prod.getProdId());
-            int finalStock = prod.getTotalStocks() + stock;
-            if (finalStock < 0) {
-                // 库存不足
-                throw new IllegalArgumentException("库存不足");
-            }
-            prod.setTotalStocks(finalStock);
-            prod.setUpdateTime(new Date());
-        });
-        // 统一修改
-        this.updateBatchById(prodList);
-
-        Map<Long, Integer> skuStock = stockMap.get("sku");
-        Set<Long> skuIds = skuStock.keySet();
-        List<Sku> skuList = skuService.listByIds(skuIds);
-        skuList.forEach(sku -> {
-            Integer stock = skuStock.get(sku.getSkuId());
-            int finalStock = sku.getActualStocks() + stock;
-            if (finalStock < 0) {
-                // 库存不足
-                throw new IllegalArgumentException("库存不足");
-            }
-            sku.setActualStocks(finalStock);
-            sku.setStocks(finalStock);
-            sku.setUpdateTime(new Date());
-        });
-        skuService.updateBatchById(skuList);
-    }
 }
