@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-/**
- * @Author 武汉尚学堂
- */
 @FeignClient(value = "member-service", fallback = ProdCommMemberFeignHystrix.class)
 public interface ProdCommMemberFeign {
 

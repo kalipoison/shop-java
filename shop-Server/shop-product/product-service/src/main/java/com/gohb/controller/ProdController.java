@@ -56,7 +56,7 @@ public class ProdController {
     }
 
     @GetMapping({"/info/{id}"})
-    @ApiOperation("数据的回显")
+    @ApiOperation("查询某个商品的详细信息")
     @PreAuthorize("hasAuthority('prod:prod:info')")
     public ResponseEntity<Prod> findById(@PathVariable("id") Long id) {
         Prod prod = prodService.getById(id);
@@ -69,6 +69,19 @@ public class ProdController {
         prodService.updateById(prod);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * 提供调用根据id查询商品信息
+     *
+     * @param prodId
+     * @return
+     */
+    @GetMapping("/findProdById")
+    @ApiOperation("新增商品")
+    Prod findProdById(@RequestParam("prodId") Long prodId) {
+        return prodService.getById(prodId);
+    }
+
 
 
 }

@@ -12,9 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-/**
- * @Author 武汉尚学堂
- */
+
 @Api(tags = "文件上传的接口")
 @RestController
 @RequestMapping("/admin/file")

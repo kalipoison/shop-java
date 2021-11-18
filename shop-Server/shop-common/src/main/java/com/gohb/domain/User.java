@@ -19,9 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-/**
- * @Author 武汉尚学堂
- */
 
 /**
  * 用户表

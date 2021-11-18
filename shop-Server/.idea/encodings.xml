@@ -17,5 +17,10 @@
     <file url="file://$PROJECT_DIR$/shop-product/product-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/shop-product/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/shop-product/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-store/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-store/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-store/store-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-store/store-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-store/store-service/src/main/java" charset="UTF-8" />
   </component>
 </project>

@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * @Author 武汉尚学堂
- */
 @Component
 @Slf4j
 public class ProdCommMemberFeignHystrix implements ProdCommMemberFeign {
