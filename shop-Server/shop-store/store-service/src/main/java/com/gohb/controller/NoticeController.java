@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gohb.domain.Notice;
 import com.gohb.service.NoticeService;
+import com.gohb.vo.NoticeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/shop/notice")
@@ -58,6 +61,16 @@ public class NoticeController {
     public ResponseEntity<Void> save(@RequestBody @Validated Notice notice) {
         this.noticeService.save(notice);
         return ResponseEntity.ok().build();
+    }
+
+
+    // --------------------------- 前台代码
+
+    @GetMapping("topNoticeList")
+    @ApiOperation("加载前台公告")
+    public ResponseEntity<List<NoticeVo>> loadFrontNotice() {
+        List<NoticeVo> noticeVos = noticeService.findNoticeVo();
+        return ResponseEntity.ok(noticeVos);
     }
 
 }

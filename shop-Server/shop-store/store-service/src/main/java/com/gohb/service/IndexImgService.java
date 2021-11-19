@@ -38,4 +38,10 @@ public interface IndexImgService extends IService<IndexImg> {
      */
     IndexImg getInfo(Long id);
 
+    /**
+     * 加载前台轮播图接口
+     *
+     * @return
+     */
+    List<IndexImgVo> findFrontIndexImg();
 }

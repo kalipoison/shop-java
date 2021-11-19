@@ -20,4 +20,10 @@ public interface ProdTagService extends IService<ProdTag> {
      */
     IPage<ProdTag> findProdByPage(Page<ProdTag> page, ProdTag prodTag);
 
+    /**
+     * 加载前台的标签分组
+     *
+     * @return
+     */
+    List<ProdTagVo> findProdTagVo();
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gohb.domain.ProdTag;
 import com.gohb.service.ProdTagService;
+import com.gohb.vo.ProdTagVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,17 @@ public class ProdTagController {
     public ResponseEntity<List<ProdTag>> list() {
         List<ProdTag> list = prodTagService.list();
         return ResponseEntity.ok(list);
+    }
+
+
+    // -----------------------------前台代码
+
+
+    @GetMapping("prodTagList")
+    @ApiOperation("加载前台的标签分组")
+    public ResponseEntity<List<ProdTagVo>> loadFrontProdTag() {
+        List<ProdTagVo> prodTagVos = prodTagService.findProdTagVo();
+        return ResponseEntity.ok(prodTagVos);
     }
 
 

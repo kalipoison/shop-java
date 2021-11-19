@@ -55,6 +55,7 @@ public class ProdTagServiceImpl extends ServiceImpl<ProdTagMapper, ProdTag> impl
         return prodTagIPage;
     }
 
+
     /**
      * 商品标签列表
      * @return
@@ -101,6 +102,26 @@ public class ProdTagServiceImpl extends ServiceImpl<ProdTagMapper, ProdTag> impl
             throw new IllegalArgumentException("有商品正在使用此标签分组，不能删除");
         }
         return super.removeById(id);
+    }
+
+    /**
+     * 加载前台的标签分组
+     *
+     * @return
+     */
+    @Override
+    public List<ProdTagVo> findProdTagVo() {
+        List<ProdTag> prodTags = prodTagMapper.selectList(new LambdaQueryWrapper<ProdTag>()
+                .eq(ProdTag::getStatus, 1)
+                .orderByAsc(ProdTag::getSeq)
+        );
+        ArrayList<ProdTagVo> prodTagVos = new ArrayList<>(prodTags.size() * 2);
+        prodTags.forEach(prodTag -> {
+            ProdTagVo prodTagVo = new ProdTagVo();
+            BeanUtil.copyProperties(prodTag, prodTagVo);
+            prodTagVos.add(prodTagVo);
+        });
+        return prodTagVos;
     }
 
 }

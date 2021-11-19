@@ -70,20 +70,13 @@ public class IndexImgServiceImpl extends ServiceImpl<IndexImgMapper, IndexImg> i
         return super.save(indexImg);
     }
 
-    @Cacheable(key = "#id")
-    @Override
-    public IndexImg getById(Serializable id) {
-        return super.getById(id);
-    }
-
-    @Caching(evict = {@CacheEvict(key = "#id"), @CacheEvict(key = IndexImgConstant.INDEX_ALL_IMGS)})
+    @CacheEvict(key = IndexImgConstant.INDEX_ALL_IMGS)
     @Override
     public boolean removeById(Serializable id) {
         return super.removeById(id);
     }
 
-    @Caching(evict = {@CacheEvict(key = "#entity.imgId"), @CacheEvict(key =
-            IndexImgConstant.INDEX_ALL_IMGS)})
+    @CacheEvict(key = IndexImgConstant.INDEX_ALL_IMGS)
     @Override
     public boolean updateById(IndexImg entity) {
         return super.updateById(entity);
@@ -122,6 +115,7 @@ public class IndexImgServiceImpl extends ServiceImpl<IndexImgMapper, IndexImg> i
      * @return
      */
     @Override
+    @Cacheable(key = "#{id}")
     public IndexImg getInfo(Long id) {
         //根据轮播图id 查询商品
         IndexImg indexImg = indexImgMapper.selectById(id);
@@ -138,6 +132,34 @@ public class IndexImgServiceImpl extends ServiceImpl<IndexImgMapper, IndexImg> i
             indexImg.setPic(prod.getPic());
         }
         return indexImg;
+    }
+
+    /**
+     * 加载前台轮播图接口
+     * 可以做缓存的
+     *
+     * @return
+     */
+    @Override
+    @Cacheable(key = IndexImgConstant.INDEX_ALL_IMGS)
+    public List<IndexImgVo> findFrontIndexImg() {
+        // 1. 查询数据库
+        List<IndexImg> indexImgs = indexImgMapper.selectList(new LambdaQueryWrapper<IndexImg>()
+                .eq(IndexImg::getStatus, 1)
+                .orderByAsc(IndexImg::getSeq)
+        );
+        if (CollectionUtils.isEmpty(indexImgs)) {
+            return Collections.emptyList();
+        }
+        // 如果不等于空
+        // 转换对象
+        ArrayList<IndexImgVo> indexImgVos = new ArrayList<>(indexImgs.size() * 2);
+        indexImgs.forEach(indexImg -> {
+            IndexImgVo indexImgVo = new IndexImgVo();
+            BeanUtil.copyProperties(indexImg, indexImgVo, true);
+            indexImgVos.add(indexImgVo);
+        });
+        return indexImgVos;
     }
 
 }
