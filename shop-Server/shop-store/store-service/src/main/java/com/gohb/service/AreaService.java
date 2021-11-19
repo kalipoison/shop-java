@@ -10,10 +10,10 @@ public interface AreaService extends IService<Area> {
 
 
     /**
-     * 根据父id查询地址集合
+     * 通过父id 查询子
      *
-     * @param pid
+     * @param pId
      * @return
      */
-    List<Area> findAreaByPid(Long pid);
+    List<Area> listByPid(Long pId);
 }

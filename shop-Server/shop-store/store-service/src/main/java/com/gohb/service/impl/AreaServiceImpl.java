@@ -1,75 +1,135 @@
-//package com.gohb.service.impl;
-//
-//import com.alibaba.fastjson.JSON;
-//import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import com.gohb.constant.AreaConstant;
-//import com.gohb.domain.Area;
-//import com.gohb.mapper.AreaMapper;
-//import com.gohb.service.AreaService;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.ObjectUtils;
-//
-//import java.util.List;
-//
-//@Service
-//@Slf4j
-//@CacheConfig(cacheNames = "com.whsxt.service.impl.AreaServiceImpl")
-//public class AreaServiceImpl extends ServiceImpl<AreaMapper, Area> implements AreaService {
-//
-//    @Autowired
-//    private AreaMapper areaMapper;
-//
-//
-//    @Override
-//    @Cacheable(key = AreaConstant.AREA_PREFIX)
-//    public List<Area> list() {
-//        return areaMapper.selectList(null);
-//    }
-//
-//
-//    /**
-//     * 新增地址
-//     * 新增地址有层级关系
-//     *
-//     * @param area
-//     * @return
-//     */
-//    @Override
-//    @CacheEvict(key = AreaConstant.AREA_PREFIX)
-//    public boolean save(Area area) {
-//        log.info("新增地址{}", JSON.toJSONString(area));
-//        // 1 拿到parentId
-//        Long parentId = area.getParentId();
-//        if (parentId == null || parentId.equals(0L)) {
-//            // 说明就是第一级节点
-//            area.setLevel(1);
-//        } else {
-//            // 查询数据库得到父节点
-//            Area parent = areaMapper.selectById(parentId);
-//            if (ObjectUtils.isEmpty(parent)) {
-//                throw new IllegalArgumentException("新增区域时父节点不存在");
-//            }
-//            area.setLevel(parent.getLevel() + 1);
-//        }
-//        return super.save(area);
-//    }
-//
-//    /**
-//     * 根据父id查询地址集合
-//     *
-//     * @param pid
-//     * @return
-//     */
-//    @Override
-//    public List<Area> findAreaByPid(Long pid) {
-//        return areaMapper.selectList(new LambdaQueryWrapper<Area>()
-//                .eq(Area::getParentId, pid)
-//        );
-//    }
-//}
+package com.gohb.service.impl;
+
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gohb.constant.AreaConstant;
+import com.gohb.domain.Area;
+import com.gohb.mapper.AreaMapper;
+import com.gohb.service.AreaService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+
+@Service
+@Slf4j
+@CacheConfig(cacheNames = "com.gohb.service.impl.AreaServiceImpl")
+public class AreaServiceImpl extends ServiceImpl<AreaMapper, Area> implements AreaService {
+
+    @Autowired
+    private AreaMapper areaMapper;
+    /**
+     * 全查询区域信息
+     *
+     * @return
+     */
+    @Override
+    @Cacheable(key = AreaConstant.ALL_AREA)
+    public List<Area> list() {
+        return areaMapper.selectList(null);
+    }
+
+    /**
+     * 通过父id 查询子
+     *
+     * @param pId
+     * @return
+     */
+    @Override
+    public List<Area> listByPid(Long pId) {
+        List<Area> areas = areaMapper.selectList(new LambdaQueryWrapper<Area>()
+                .eq(Area::getParentId, pId)
+        );
+        if (ObjectUtils.isEmpty(areas)) {
+            return Collections.emptyList();
+        }
+        return areas;
+    }
+    /**
+     * 新增一个地区
+     * 清理缓存
+     *  @param area
+     * @return
+     */
+    @Override
+    @CacheEvict(key = AreaConstant.ALL_AREA)
+    public boolean save(Area area) {
+        log.info("新增一个区域{}", JSON.toJSONString(area));
+        Long parentId = area.getParentId();
+        if (parentId == null || parentId.equals(0L)) {
+            area.setLevel(1);
+        } else {
+            //查询到父id 设置等级+1
+            Area parent = areaMapper.selectById(parentId);
+            if (ObjectUtils.isEmpty(parent)){
+                throw new IllegalArgumentException("新增区域时父节点不存在");
+            }
+            area.setLevel(parent.getLevel() + 1);
+        }
+        return super.save(area);
+    }
+
+    /**
+     * 删除一个区域
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(key = "#id"),
+                    @CacheEvict(key = AreaConstant.ALL_AREA)
+            }
+    )
+    public boolean removeById(Serializable id) {
+        log.info("删除一个区域id 为{}", id);
+        //先判断他下面有没有子节点
+        Integer count = areaMapper.selectCount(new LambdaQueryWrapper<Area>()
+                .eq(Area::getParentId, id)
+        );
+        if (count != null && count > 0) {
+            throw new IllegalArgumentException("删除的区域有子节点，不能删除,要删除的id 为" + id);
+        }
+        return super.removeById(id);
+    }
+
+    /**
+     * 更新一个区域
+     *
+     * @param area
+     * @return
+     */
+    @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(key = "area.areaId"),
+                    @CacheEvict(key = AreaConstant.ALL_AREA)
+            }
+    )
+    public boolean updateById(Area area) {
+        return super.updateById(area);
+    }
+    /**
+     * 查询放入缓存中
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    @Cacheable(key = "#id")
+    public Area getById(Serializable id) {
+        return super.getById(id);
+    }
+
+}

@@ -9,12 +9,18 @@ import com.gohb.mapper.PickAddrMapper;
 import com.gohb.service.PickAddrService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.Serializable;
 
 
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "com.sxt.service.impl.PickAddrServiceImpl")
 public class PickAddrServiceImpl extends ServiceImpl<PickAddrMapper, PickAddr> implements PickAddrService {
 
     @Autowired
@@ -33,5 +39,21 @@ public class PickAddrServiceImpl extends ServiceImpl<PickAddrMapper, PickAddr> i
         return pickAddrMapper.selectPage(page, new LambdaQueryWrapper<PickAddr>()
                 .like(StringUtils.hasText(pickAddr.getAddrName()), PickAddr::getAddrName, pickAddr.getAddrName())
         );
+    }
+
+    @Cacheable(key = "#id")
+    @Override
+    public PickAddr getById(Serializable id) {
+        return super.getById(id);
+    }
+    @CacheEvict(key = "#id")
+    @Override
+    public boolean removeById(Serializable id) {
+        return super.removeById(id);
+    }
+    @CacheEvict(key = "#entity.addrId")
+    @Override
+    public boolean updateById(PickAddr entity) {
+        return super.updateById(entity);
     }
 }

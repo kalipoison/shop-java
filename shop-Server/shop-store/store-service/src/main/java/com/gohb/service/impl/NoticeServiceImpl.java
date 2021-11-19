@@ -11,15 +11,20 @@ import com.gohb.service.NoticeService;
 import com.gohb.vo.NoticeVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "com.gohb.service.impl.NoticeServiceImpl")
 public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     @Autowired
@@ -51,6 +56,41 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             notice.setPublishTime(new Date());
         }
         return super.save(notice);
+    }
+
+    @Override
+    @Cacheable(key = "#id")
+    public Notice getById(Serializable id) {
+        return super.getById(id);
+    }
+
+    /**
+     * 更新操作
+     * 不能使用@CachePut 注解来操作更新，因为执行完以后会缓存一个boolean
+     * 可以使用@CacheEvict,使用beforeInvocation 来前置执行
+     *
+     * @param entity
+     * @return
+     */
+    @Override
+    @CacheEvict(key = "#entity.id", beforeInvocation = true)
+    public boolean updateById(Notice entity) {
+        log.info("更新的公告为", JSON.toJSONString(entity));
+        entity.setUpdateTime(new Date());
+        return super.updateById(entity);
+    }
+
+    /**
+     * 删除
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    @CacheEvict(key = "#id")
+    public boolean removeById(Serializable id) {
+        log.info("删除一个公告,id 为{}", id);
+        return super.removeById(id);
     }
 
 
