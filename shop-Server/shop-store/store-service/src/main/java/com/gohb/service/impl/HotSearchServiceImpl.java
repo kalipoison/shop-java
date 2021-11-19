@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -67,5 +69,18 @@ public class HotSearchServiceImpl extends ServiceImpl<HotSearchMapper, HotSearch
         log.info("新增热搜{}", JSON.toJSONString(hotSearch));
         hotSearch.setRecDate(new Date());
         return super.save(hotSearch);
+    }
+
+
+    @Override
+    public List<HotSearch> findHotSearchByShopId(Integer number, Integer shopId, Integer sort) {
+        List<HotSearch> hotSearches = hotSearchMapper.selectList(new LambdaQueryWrapper<HotSearch>()
+                .eq(HotSearch::getShopId, shopId)
+        );
+        List<HotSearch> hotList = new ArrayList<>(number);
+        for (HotSearch hotSearch : hotSearches){
+            hotList.add(hotSearch);
+        }
+        return hotList;
     }
 }

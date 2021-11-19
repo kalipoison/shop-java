@@ -9,6 +9,7 @@
         <module>shop-manager</module>
         <module>shop-product</module>
         <module>shop-store</module>
+        <module>shop-search</module>
     </modules>
 
     <parent>

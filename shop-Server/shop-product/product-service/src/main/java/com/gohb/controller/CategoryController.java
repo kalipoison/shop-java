@@ -70,5 +70,13 @@ public class CategoryController {
         return ResponseEntity.ok(categoryList);
     }
 
+    //-------------------------前台代码
+    @GetMapping("category/categoryInfo")
+    @ApiOperation("前台分类信息")
+    public ResponseEntity<List<Category>> getFrontCategoryInfo(@RequestParam("parentId") String parentId) {
+        List<Category> categoryList = categoryService.listAllParent();
+        return ResponseEntity.ok(categoryList);
+    }
+
 
 }

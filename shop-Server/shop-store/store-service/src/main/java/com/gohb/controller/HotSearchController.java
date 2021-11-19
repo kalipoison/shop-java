@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("admin/hotSearch")
@@ -53,12 +54,22 @@ public class HotSearchController {
         hotSearchService.save(hotSearch);
         return ResponseEntity.ok().build();
     }
+
     @PutMapping
     @PreAuthorize("hasAuthority('admin:hotSearch:update')")
     @ApiOperation("新增一个热搜")
     public ResponseEntity<Void> update(@RequestBody @Validated HotSearch hotSearch) {
         hotSearchService.updateById(hotSearch);
         return ResponseEntity.ok().build();
+    }
+
+    //------------------------前台代码
+
+    @GetMapping("hotSearchByShopId")
+    @ApiOperation("前台热搜显示")
+    public ResponseEntity<List<HotSearch>> hotSearchByShopId(@RequestParam("number") Integer number, @RequestParam("shopId") Integer shopId, @RequestParam("sort") Integer sort){
+        List<HotSearch> hotSearchList = hotSearchService.findHotSearchByShopId(number, shopId, sort);
+        return ResponseEntity.ok(hotSearchList);
     }
 
 
