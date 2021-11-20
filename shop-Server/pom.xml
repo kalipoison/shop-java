@@ -11,6 +11,7 @@
         <module>shop-store</module>
         <module>shop-search</module>
         <module>shop-member</module>
+        <module>shop-message</module>
     </modules>
 
     <parent>

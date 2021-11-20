@@ -11,13 +11,13 @@ import java.util.Map;
 public interface UserService extends IService<User> {
 
 
-//    /**
-//     * 发注册验证码
-//     *
-//     * @param openId
-//     * @param sendMap
-//     */
-//    void sendMsg(String openId, Map<String, String> sendMap);
+    /**
+     * 发注册验证码
+     *
+     * @param openId
+     * @param sendMap
+     */
+    void sendMsg(String openId, Map<String, String> sendMap);
 
     /**
      * 保存手机号

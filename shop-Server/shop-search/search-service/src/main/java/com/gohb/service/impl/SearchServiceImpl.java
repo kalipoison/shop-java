@@ -25,9 +25,6 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @Author 武汉尚学堂
- */
 @Service
 public class SearchServiceImpl implements SearchService {
 

@@ -5,9 +5,6 @@ import com.gohb.es.ProdEs;
 
 import java.util.List;
 
-/**
- * @Author 武汉尚学堂
- */
 public interface SearchService {
 
 

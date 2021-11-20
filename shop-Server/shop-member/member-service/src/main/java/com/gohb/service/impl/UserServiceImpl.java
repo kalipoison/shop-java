@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gohb.constant.QueueConstant;
 import com.gohb.domain.User;
 import com.gohb.mapper.UserMapper2;
+import com.gohb.model.AliSmsModel;
 import com.gohb.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -45,36 +46,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper2, User> implements U
     }
 
 
-//    /**
-//     * 发注册验证码
-//     * 1. 生成一个code
-//     * 2. 放在redis
-//     * 3. 设置一个过期时间 5min
-//     * 4. 组装参数
-//     * 5. 放入mq
-//     * 6. 返回
-//     *
-//     * @param openId
-//     * @param sendMap
-//     */
-//    @Override
-//    public void sendMsg(String openId, Map<String, String> sendMap) {
-//        String phonenum = sendMap.get("phonenum").toString();
-//        // 生成一个验证码
-//        String code = createCode();
-//        // 放redis
-//        redisTemplate.opsForValue().set(phonenum, code, Duration.ofMinutes(5));
-//        // 组装参数 放mq 短信的签名 短信的模板，短信的code
-//        AliSmsModel aliSmsModel = new AliSmsModel();
-//        aliSmsModel.setPhoneNumbers(phonenum);
-//        aliSmsModel.setSignName("ego商城");
-//        aliSmsModel.setTemplateCode("SMS_203185255");
-//        HashMap<String, String> map = new HashMap<>(2);
-//        map.put("code", code);
-//        aliSmsModel.setTemplateParam(JSON.toJSONString(map));
-//        // 放mq
-//        rabbitTemplate.convertAndSend(QueueConstant.PHONE_SEND_EX, QueueConstant.PHONE_SEND_KEY, JSON.toJSONString(aliSmsModel));
-//    }
+    /**
+     * 发注册验证码
+     * 1. 生成一个code
+     * 2. 放在redis
+     * 3. 设置一个过期时间 5min
+     * 4. 组装参数
+     * 5. 放入mq
+     * 6. 返回
+     *
+     * @param openId
+     * @param sendMap
+     */
+    @Override
+    public void sendMsg(String openId, Map<String, String> sendMap) {
+        String phonenum = sendMap.get("phonenum").toString();
+        // 生成一个验证码
+        String code = createCode();
+        // 放redis
+        redisTemplate.opsForValue().set(phonenum, code, Duration.ofMinutes(5));
+        // 组装参数 放mq 短信的签名 短信的模板，短信的code
+        AliSmsModel aliSmsModel = new AliSmsModel();
+        aliSmsModel.setPhoneNumbers(phonenum);
+        aliSmsModel.setSignName("shop"); // 签名名称, 申请短信服务的那个
+        aliSmsModel.setTemplateCode("SMS_203185255"); // 模板的CODE， 也是申请短信服务的时候填写的
+        HashMap<String, String> map = new HashMap<>(2);
+        map.put("code", code);
+        aliSmsModel.setTemplateParam(JSON.toJSONString(map));
+//        log.info("短信验证码信息" + JSON.toJSONString(map));
+        // 放mq
+        rabbitTemplate.convertAndSend(QueueConstant.PHONE_SEND_EX, QueueConstant.PHONE_SEND_KEY, JSON.toJSONString(aliSmsModel));
+    }
 
     private String createCode() {
         // 位数 4  6  8多一点
