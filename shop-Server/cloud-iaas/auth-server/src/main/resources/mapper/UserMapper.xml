@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gohb.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="com.gohb.domain.User">
+    <!--@mbg.generated-->
+    <!--@Table `user`-->
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="user_mail" jdbcType="VARCHAR" property="userMail" />
+    <result column="login_password" jdbcType="VARCHAR" property="loginPassword" />
+    <result column="pay_password" jdbcType="VARCHAR" property="payPassword" />
+    <result column="user_mobile" jdbcType="VARCHAR" property="userMobile" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="user_regtime" jdbcType="TIMESTAMP" property="userRegtime" />
+    <result column="user_regip" jdbcType="VARCHAR" property="userRegip" />
+    <result column="user_lasttime" jdbcType="TIMESTAMP" property="userLasttime" />
+    <result column="user_lastip" jdbcType="VARCHAR" property="userLastip" />
+    <result column="user_memo" jdbcType="VARCHAR" property="userMemo" />
+    <result column="sex" jdbcType="CHAR" property="sex" />
+    <result column="birth_date" jdbcType="CHAR" property="birthDate" />
+    <result column="pic" jdbcType="VARCHAR" property="pic" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    user_id, nick_name, real_name, user_mail, login_password, pay_password, user_mobile, 
+    modify_time, user_regtime, user_regip, user_lasttime, user_lastip, user_memo, sex, 
+    birth_date, pic, `status`, score
+  </sql>
+</mapper>

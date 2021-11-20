@@ -10,6 +10,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/manager-api/pom.xml" />
+        <option value="$PROJECT_DIR$/member-service/pom.xml" />
         <option value="$PROJECT_DIR$/product-api/pom.xml" />
         <option value="$PROJECT_DIR$/search-api/pom.xml" />
         <option value="$PROJECT_DIR$/shop-service/pom.xml" />

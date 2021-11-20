@@ -29,7 +29,7 @@ public class AreaController {
     }
 
     @GetMapping("/listByPid")
-    @PreAuthorize("hasAuthority('admin:area:list')")
+//    @PreAuthorize("hasAuthority('admin:area:list')")
     @ApiOperation("通过父区域id 查询子区域")
     public ResponseEntity<List<Area>> listByPid(@RequestParam(name = "pid", defaultValue = "0")
                                                         Long pId) {

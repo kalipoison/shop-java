@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gohb.mapper.UserAddrOrderMapper">
+  <resultMap id="BaseResultMap" type="com.gohb.domain.UserAddrOrder">
+    <!--@mbg.generated-->
+    <!--@Table user_addr_order-->
+    <id column="addr_order_id" jdbcType="BIGINT" property="addrOrderId" />
+    <result column="addr_id" jdbcType="BIGINT" property="addrId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="receiver" jdbcType="VARCHAR" property="receiver" />
+    <result column="province_id" jdbcType="BIGINT" property="provinceId" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="area_id" jdbcType="BIGINT" property="areaId" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="city_id" jdbcType="BIGINT" property="cityId" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="addr" jdbcType="VARCHAR" property="addr" />
+    <result column="post_code" jdbcType="VARCHAR" property="postCode" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    addr_order_id, addr_id, user_id, receiver, province_id, province, area_id, area, 
+    city_id, city, addr, post_code, mobile, create_time, version
+  </sql>
+</mapper>

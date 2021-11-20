@@ -18,6 +18,8 @@
         <module name="store-service" />
         <module name="admin-server" />
         <module name="product-api" />
+        <module name="member-service" />
+        <module name="member-api" />
         <module name="shop-common" />
         <module name="gateway" />
         <module name="manager-api" />
@@ -32,12 +34,15 @@
       <module name="gateway" target="1.8" />
       <module name="manager-api" target="8" />
       <module name="manager-service" target="8" />
+      <module name="member-api" target="8" />
+      <module name="member-service" target="8" />
       <module name="product-api" target="8" />
       <module name="product-service" target="8" />
       <module name="search-api" target="8" />
       <module name="search-service" target="8" />
       <module name="shop-common" target="1.8" />
       <module name="shop-manager" target="8" />
+      <module name="shop-member" target="8" />
       <module name="shop-product" target="8" />
       <module name="shop-search" target="8" />
       <module name="shop-service" target="8" />
@@ -56,6 +61,8 @@
       <module name="gateway" options="-parameters" />
       <module name="manager-api" options="-parameters" />
       <module name="manager-service" options="-parameters" />
+      <module name="member-api" options="-parameters" />
+      <module name="member-service" options="-parameters" />
       <module name="product-api" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="search-api" options="-parameters" />

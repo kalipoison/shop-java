@@ -10,6 +10,7 @@
         <module>shop-product</module>
         <module>shop-store</module>
         <module>shop-search</module>
+        <module>shop-member</module>
     </modules>
 
     <parent>
