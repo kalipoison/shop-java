@@ -6,6 +6,10 @@
     <file url="file://$PROJECT_DIR$/cloud-iaas/config-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/cloud-iaas/eureka-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/cloud-iaas/gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-cart/cart-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-cart/cart-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-cart/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shop-cart/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/shop-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/shop-manager/manager-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/shop-manager/manager-service/src/main/java" charset="UTF-8" />

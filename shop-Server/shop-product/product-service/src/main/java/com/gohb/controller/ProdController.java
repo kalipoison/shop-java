@@ -3,7 +3,9 @@ package com.gohb.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gohb.domain.Prod;
+import com.gohb.domain.Sku;
 import com.gohb.service.ProdService;
+import com.gohb.service.SkuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class ProdController {
 
     @Autowired
     private ProdService prodService;
+
+    @Autowired
+    private SkuService skuService;
 
     @GetMapping("/page")
     @ApiOperation("分页查询商品")
@@ -86,6 +91,18 @@ public class ProdController {
     }
 
 
+    /**
+     * 远程调用根据skuIds查询sku的集合
+     *
+     * @param skuIds
+     * @return
+     */
+    @PostMapping("/getSkuByIds")
+    @ApiOperation("根据skuIds查询sku的集合")
+    List<Sku> getSkuByIds(@RequestBody List<Long> skuIds) {
+            return skuService.listByIds(skuIds);
+    }
+
     //-----------------------------前台代码
 
     @GetMapping("prod/prodInfo")
@@ -96,17 +113,7 @@ public class ProdController {
     }
 
 
-//    /**
-//     * 远程调用根据skuIds查询sku的集合
-//     *
-//     * @param skuIds
-//     * @return
-//     */
-//    @PostMapping("/getSkuByIds")
-//    @ApiOperation("根据skuIds查询sku的集合")
-//    List<Sku> getSkuByIds(@RequestBody List<Long> skuIds) {
-//        return skuService.listByIds(skuIds);
-//    }
+
 //
 //
 //    /**
