@@ -74,7 +74,7 @@ public class UserController {
         WxMsgModel wxMsgModel = new WxMsgModel();
         wxMsgModel.setToUser(openId);
         wxMsgModel.setUrl("https://www.baidu.com");
-        wxMsgModel.setTemplateId("ZYslZEhVwU0eio66aWznGld5_GuRn_gCcAt-STtMd-k");
+        wxMsgModel.setTemplateId("7fivzwvXvyoTLqcvryPki7iyzefPs9z0CvOilFQscu0"); // 微信公众号申请的模板id
         wxMsgModel.setTopColor("#FF0000");
         HashMap<String, Map<String, String>> data = new HashMap<>();
         data.put("userName", WxMsgModel.buildMap(name, "#FF0000"));
@@ -82,10 +82,8 @@ public class UserController {
         data.put("product", WxMsgModel.buildMap("女朋友", "#FF0000"));
         data.put("money", WxMsgModel.buildMap("0.1", "#FF0000"));
         wxMsgModel.setData(data);
-
         // 用mq发消息
         rabbitTemplate.convertAndSend(QueueConstant.WECHAT_SEND_EX, QueueConstant.WECHAT_SEND_KEY, JSON.toJSONString(wxMsgModel));
-
         return ResponseEntity.ok("发送成功");
     }
 
