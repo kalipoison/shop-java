@@ -38,4 +38,11 @@ public interface ProdService extends IService<Prod> {
      */
     Page<Prod> findProdByPageToEs(Page<Prod> page, Date t1, Date t2);
 
+    /**
+     * 前台根据id查询商品的信息（包括了sku）
+     *
+     * @param prodId
+     * @return
+     */
+    Prod findProdAndSkuById(Long prodId);
 }

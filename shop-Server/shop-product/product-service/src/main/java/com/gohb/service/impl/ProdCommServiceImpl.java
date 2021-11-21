@@ -7,12 +7,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gohb.dao.ProductDao;
 import com.gohb.domain.Prod;
 import com.gohb.domain.ProdComm;
+import com.gohb.domain.User;
 import com.gohb.es.ProdEs;
+import com.gohb.feign.ProdCommMemberFeign;
 import com.gohb.mapper.ProdCommMapper;
 import com.gohb.mapper.ProdMapper;
 import com.gohb.service.ProdCommService;
+import com.gohb.vo.ProdCommResult;
 import com.gohb.vo.ProdCommVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +37,15 @@ public class ProdCommServiceImpl extends ServiceImpl<ProdCommMapper, ProdComm> i
 
     @Autowired
     private ProdCommMapper prodCommMapper;
+
     @Autowired
     private ProdMapper prodMapper;
+
+    @Autowired
+    private ProductDao prodEsDao;
+
+    @Autowired
+    private ProdCommMemberFeign prodCommMemberFeign;
 
     /**
      * 分页查询商品的评论
@@ -81,117 +92,125 @@ public class ProdCommServiceImpl extends ServiceImpl<ProdCommMapper, ProdComm> i
             });
         }
         return prodCommPage;
-
-//        // 排序
-//        page.addOrder(OrderItem.desc("rec_time"));
-//        IPage<ProdComm> prodCommIPage = new Page<>();
-//        //根据商品名称查询prodIds
-//        String prodName = prodComm.getProdName();
-//        List<Object> prodIds = null;
-//        if (!StringUtils.isEmpty(prodName)) {
-//            //如果有名称查询prodIds
-//            prodIds = prodMapper.selectObjs(new LambdaQueryWrapper<Prod>()
-//                    .select(Prod::getProdId)
-//                    .like(Prod::getProdName, prodName)
-//            );
-//            if (CollectionUtils.isEmpty(prodIds)) {
-//                prodCommIPage.setRecords(Collections.emptyList());
-//                prodCommIPage.setTotal(0L);
-//                return prodCommIPage;
-//            }
-//        }
-//        //查询所有评论条件就是如果有prodIds 就带上没有就不带
-//        prodCommIPage = prodCommMapper.selectPage(page, new LambdaQueryWrapper<ProdComm>()
-//                .eq(prodComm.getStatus() != null, ProdComm::getStatus, prodComm.getStatus())
-//                .in(!CollectionUtils.isEmpty(prodIds), ProdComm::getProdId, prodIds)
-//        );
-//        List<ProdComm> records = prodCommIPage.getRecords();
-//        if (!CollectionUtils.isEmpty(records)) {
-//            //拿到商品ids 然后查询商品表然后组装数据filter 过滤条件map 抽取collect 转换集合
-//            //stream 流1 过程filter，map，sort，limit， 2 终止foreach collect
-//            List<Long> pIds = records.stream().map(ProdComm::getProdId).collect(Collectors.toList());
-//            List<Prod> prods = prodMapper.selectList(new LambdaQueryWrapper<Prod>()
-//                    .in(Prod::getProdId, pIds)
-//            );
-//            //在代码里面做组装
-//            records.forEach(r -> {
-//                Prod prod1 = prods.stream()
-//                        .filter(prod -> prod.getProdId().equals(r.getProdId()))
-//                        .collect(Collectors.toList())
-//                        .get(0);
-//                r.setProdName(prod1.getProdName());
-//            });
-//        }
-//        return prodCommIPage;
     }
 
 
-//    /**
-//     * 根据id 查询评论
-//     *
-//     * @param id
-//     * @return
-//     */
-//    @Override
-//    public ProdCommVo getProdCommById(Long id) {
-//        ProdCommVo prodCommVo = new ProdCommVo();
-//        ProdComm prodComm = prodCommMapper.selectOne(new LambdaQueryWrapper<ProdComm>()
-//                .eq(ProdComm::getProdCommId, id)
-//        );
-//        if (ObjectUtils.isEmpty(prodComm)) {
-////如果评论为空，则返回空
-//            throw new IllegalArgumentException("评论id 为空");
-//        }
-//        Prod prod = prodMapper.selectOne(new LambdaQueryWrapper<Prod>()
-//                .eq(Prod::getProdId, prodComm.getProdId())
-//        );
-//        if (!ObjectUtils.isEmpty(prod)) {
-//            prodCommVo.setProdName(prod.getProdName());
-//        }
-//        BeanUtil.copyProperties(prodComm, prodCommVo, true);
-//        return prodCommVo;
-//    }
-//
-//    @Override
-//    public ProdCommVo getProdCommAll(Long prodId) {
-//        ProdCommVo prodCommVo = new ProdCommVo();
-//        // 直接从es拿好评率
-//        Optional<ProdEs> optionalProdEs = prodEsDao.findById(prodId);
-//        ProdEs prodEs = optionalProdEs.get();
-//        // 好评率
-//        BigDecimal positiveRating = prodEs.getPositiveRating();
-//        // 好评数
-//        Long praiseNumber = prodEs.getPraiseNumber();
-//        // 总评数 总的数量太多了 占内存 jvm可能直接爆炸
-////        List<ProdComm> prodComms = prodCommMapper.selectList(new LambdaQueryWrapper<ProdComm>()
-////                .eq(ProdComm::getProdId, prodId)
-////        );
-//        Integer totalCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
-//                .eq(ProdComm::getProdId, prodId)
-//        );
-//        Integer secondCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
-//                .eq(ProdComm::getProdId, prodId)
-//                .eq(ProdComm::getEvaluate, 1)
-//        );
-//
-//        Integer badCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
-//                .eq(ProdComm::getProdId, prodId)
-//                .eq(ProdComm::getEvaluate, 2)
-//        );
-//
-//        Integer picCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
-//                .eq(ProdComm::getProdId, prodId)
-//                .isNotNull(ProdComm::getPics)
-//        );
-//
-//        prodCommResult.setNumber(totalCount);
-//        prodCommResult.setNegativeNumber(badCount);
-//        prodCommResult.setSecondaryNumber(secondCount);
-//        prodCommResult.setPicNumber(picCount);
-//        prodCommResult.setPositiveRating(positiveRating);
-//        prodCommResult.setPraiseNumber(praiseNumber);
-//        return prodCommResult;
-//    }
+    /**
+     * 根据id 查询评论
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public ProdCommVo getProdCommById(Long id) {
+        ProdCommVo prodCommVo = new ProdCommVo();
+        ProdComm prodComm = prodCommMapper.selectOne(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdCommId, id)
+        );
+        if (ObjectUtils.isEmpty(prodComm)) {
+//如果评论为空，则返回空
+            throw new IllegalArgumentException("评论id 为空");
+        }
+        Prod prod = prodMapper.selectOne(new LambdaQueryWrapper<Prod>()
+                .eq(Prod::getProdId, prodComm.getProdId())
+        );
+        if (!ObjectUtils.isEmpty(prod)) {
+            prodCommVo.setProdName(prod.getProdName());
+        }
+        BeanUtil.copyProperties(prodComm, prodCommVo, true);
+        return prodCommVo;
+    }
 
+    /**
+     * 前台查询商品的评论总览
+     *
+     * @param prodId
+     * @return
+     */
+    @Override
+    public ProdCommResult findFrontProdComm(Long prodId) {
+        ProdCommResult prodCommResult = new ProdCommResult();
+        // 直接从es拿好评率
+        Optional<ProdEs> optionalProdEs = prodEsDao.findById(prodId);
+        ProdEs prodEs = optionalProdEs.get();
+        // 好评率
+        BigDecimal positiveRating = prodEs.getPositiveRating();
+        // 好评数
+        Long praiseNumber = prodEs.getPraiseNumber();
+        // 总评数 总的数量太多了 占内存 jvm可能直接爆炸
+//        List<ProdComm> prodComms = prodCommMapper.selectList(new LambdaQueryWrapper<ProdComm>()
+//                .eq(ProdComm::getProdId, prodId)
+//        );
+        Integer totalCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+        );
+        Integer secondCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .eq(ProdComm::getEvaluate, 1)
+        );
+
+        Integer badCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .eq(ProdComm::getEvaluate, 2)
+        );
+
+        Integer picCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .isNotNull(ProdComm::getPics)
+        );
+
+        prodCommResult.setNumber(totalCount);
+        prodCommResult.setNegativeNumber(badCount);
+        prodCommResult.setSecondaryNumber(secondCount);
+        prodCommResult.setPicNumber(picCount);
+        prodCommResult.setPositiveRating(positiveRating);
+        prodCommResult.setPraiseNumber(praiseNumber);
+        return prodCommResult;
+    }
+
+    /**
+     * 分页查询前台商品的评论总览
+     * 1.分页查询评论
+     * 2.远程调用获取用户信息
+     * 3.组装数据返回
+     *
+     * @param page
+     * @param prodId
+     * @param evaluate
+     * @return
+     */
+    @Override
+    public Page<ProdComm> getFrontProdCommPage(Page<ProdComm> page, Long prodId, Integer evaluate) {
+
+        Page<ProdComm> prodCommPage = prodCommMapper.selectPage(page, new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .eq(evaluate != -1, ProdComm::getEvaluate, evaluate)
+                .orderByDesc(ProdComm::getRecTime)
+        );
+        List<ProdComm> prodCommList = prodCommPage.getRecords();
+        if (CollectionUtils.isEmpty(prodCommList)) {
+            return prodCommPage;
+        }
+        // 评论要携带用户信息 远程调用 获取用户信息
+        List<String> userIds = prodCommList.stream()
+                .map(ProdComm::getUserId)
+                .collect(Collectors.toList());
+        // 发远程代用了 userId 获取到一个用户对象
+        List<User> userList = prodCommMemberFeign.findUserInfoByUserIds(userIds);
+        if (!CollectionUtils.isEmpty(userList)) {
+            // 就算没有用户信息回来 我们也正常返回，前台给一个默认值就可以
+            prodCommList.forEach(prodComm -> {
+                User user1 = userList.stream()
+                        .filter(user -> user.getUserId().equals(prodComm.getUserId()))
+                        .collect(Collectors.toList())
+                        .get(0);
+                prodComm.setRecTime(prodComm.getRecTime());
+                prodComm.setReplyTime(prodComm.getReplyTime());
+                prodComm.setNickName(user1.getNickName());
+                prodComm.setPic(user1.getPic());
+            });
+        }
+        return prodCommPage;
+    }
 
 }

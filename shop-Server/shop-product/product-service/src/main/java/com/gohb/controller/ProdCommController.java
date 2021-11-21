@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gohb.domain.ProdComm;
 import com.gohb.domain.ProdCommSxt;
 import com.gohb.service.ProdCommService;
+import com.gohb.vo.ProdCommResult;
 import com.gohb.vo.ProdCommVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,47 +31,41 @@ public class ProdCommController {
         return ResponseEntity.ok(prodCommIPage);
     }
 
-//    /**
-//     * 需要返回什么数据
-//     * 总评多少个
-//     * 好评多少个
-//     * 好频率多少
-//     * 中评多少个
-//     * 差评多少个
-//     * 带图的多少个
-//     *
-//     * @param prodId
-//     * @return
-//     */
-//    @GetMapping("prodComm/prodCommData")
-//    @ApiOperation("根据商品id 前台查询商品评论总览")
-//    public ResponseEntity<ProdCommVo> getProdCommAll(@RequestParam("prodId") Long prodId) {
-//        ProdCommVo prodCommVo = prodCommService.getProdCommAll(prodId);
-//        return ResponseEntity.ok(prodCommVo);
-//    }
-//
-//    @GetMapping("prodComm/prodCommPageByProd")
-//    @ApiOperation("分页查询前台的评论")
-//    public ResponseEntity<IPage<ProdCommSxt>> prodCommPageByProd(Page<ProdComm> page, ProdComm prodComm) {
-//        IPage<ProdCommSxt> prodCommSxtIPage = prodCommService.prodCommPageByProd(page, prodComm);
-//        return ResponseEntity.ok(prodCommSxtIPage);
-//    }
-//
-//    @GetMapping("{id}")
-//    @ApiOperation("获得一条评论数据")
-//    @PreAuthorize("hasAuthority('prod:prodComm:info')")
-//    public ResponseEntity<ProdCommVo> findById(@PathVariable("id") Long id) {
-//        ProdCommVo byId = prodCommService.getProdCommById(id);
-//        return ResponseEntity.ok().body(byId);
-//    }
-//
-//    @PutMapping
-//    @ApiOperation("评论的修改")
-//    @PreAuthorize("hasAuthority('prod:prodComm:update')")
-//    public ResponseEntity<Void> update(@RequestBody @Validated ProdComm prodComm) {
-//        this.prodCommService.updateById(prodComm);
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping("{id}")
+    @ApiOperation("获得一条评论数据")
+    @PreAuthorize("hasAuthority('prod:prodComm:info')")
+    public ResponseEntity<ProdCommVo> findById(@PathVariable("id") Long id) {
+        ProdCommVo byId = prodCommService.getProdCommById(id);
+        return ResponseEntity.ok().body(byId);
+    }
+
+    @PutMapping
+    @ApiOperation("评论的修改")
+    @PreAuthorize("hasAuthority('prod:prodComm:update')")
+    public ResponseEntity<Void> update(@RequestBody @Validated ProdComm prodComm) {
+        this.prodCommService.updateById(prodComm);
+        return ResponseEntity.ok().build();
+    }
+
+
+
+    //------------------------ 前台代码
+
+    @GetMapping("prodComm/prodCommData")
+    @ApiOperation("根据商品id 前台查询商品评论总览")
+    public ResponseEntity<ProdCommResult> getProdCommAll(@RequestParam("prodId") Long prodId) {
+        ProdCommResult prodCommResult = prodCommService.findFrontProdComm(prodId);
+        return ResponseEntity.ok(prodCommResult);
+    }
+
+    @GetMapping("prodComm/prodCommPageByProd")
+    @ApiOperation("分页查询前台商品的评论总览")
+    public ResponseEntity<Page<ProdComm>> getFrontProdCommPage(Page<ProdComm> page, Long prodId, Integer evaluate) {
+        Page<ProdComm> prodCommPage = prodCommService.getFrontProdCommPage(page, prodId, evaluate);
+        return ResponseEntity.ok(prodCommPage);
+    }
+
+
 
 
 }

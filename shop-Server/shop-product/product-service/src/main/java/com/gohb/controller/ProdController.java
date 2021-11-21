@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/prod/prod")
@@ -70,6 +71,8 @@ public class ProdController {
         return ResponseEntity.ok().build();
     }
 
+    //-------------------------远程调用代码
+
     /**
      * 提供调用根据id查询商品信息
      *
@@ -81,6 +84,41 @@ public class ProdController {
     Prod findProdById(@RequestParam("prodId") Long prodId) {
         return prodService.getById(prodId);
     }
+
+
+    //-----------------------------前台代码
+
+    @GetMapping("prod/prodInfo")
+    @ApiOperation("前台根据id查询商品的信息（包括了sku）")
+    public ResponseEntity<Prod> frontFindProdById(Long prodId) {
+        Prod prod = prodService.findProdAndSkuById(prodId);
+        return ResponseEntity.ok(prod);
+    }
+
+
+//    /**
+//     * 远程调用根据skuIds查询sku的集合
+//     *
+//     * @param skuIds
+//     * @return
+//     */
+//    @PostMapping("/getSkuByIds")
+//    @ApiOperation("根据skuIds查询sku的集合")
+//    List<Sku> getSkuByIds(@RequestBody List<Long> skuIds) {
+//        return skuService.listByIds(skuIds);
+//    }
+//
+//
+//    /**
+//     * 修改库存的方法
+//     *
+//     * @param stockMap
+//     */
+//    @PostMapping("changeStock")
+//    @ApiOperation("修改库存的方法")
+//    void changeStock(@RequestBody Map<String, Map<Long, Integer>> stockMap) {
+//        prodService.changeStock(stockMap);
+//    }
 
 
 
