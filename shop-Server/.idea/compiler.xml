@@ -12,6 +12,7 @@
         <module name="auth-server" />
         <module name="product-service" />
         <module name="store-api" />
+        <module name="order-api" />
         <module name="eureka-server" />
         <module name="message-service" />
         <module name="config-server" />
@@ -24,6 +25,7 @@
         <module name="member-service" />
         <module name="member-api" />
         <module name="shop-common" />
+        <module name="order-service" />
         <module name="cart-api" />
         <module name="gateway" />
         <module name="manager-api" />
@@ -44,6 +46,8 @@
       <module name="member-service" target="8" />
       <module name="message-api" target="8" />
       <module name="message-service" target="8" />
+      <module name="order-api" target="8" />
+      <module name="order-service" target="8" />
       <module name="product-api" target="8" />
       <module name="product-service" target="8" />
       <module name="search-api" target="8" />
@@ -53,6 +57,7 @@
       <module name="shop-manager" target="8" />
       <module name="shop-member" target="8" />
       <module name="shop-message" target="8" />
+      <module name="shop-order" target="8" />
       <module name="shop-product" target="8" />
       <module name="shop-search" target="8" />
       <module name="shop-service" target="8" />
@@ -77,12 +82,15 @@
       <module name="member-service" options="-parameters" />
       <module name="message-api" options="-parameters" />
       <module name="message-service" options="-parameters" />
+      <module name="order-api" options="-parameters" />
+      <module name="order-service" options="-parameters" />
       <module name="product-api" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="search-api" options="-parameters" />
       <module name="search-service" options="-parameters" />
       <module name="shop-common" options="-parameters" />
       <module name="shop-manager" options="-parameters" />
+      <module name="shop-order" options="-parameters" />
       <module name="shop-search" options="-parameters" />
       <module name="shop-service" options="-parameters" />
       <module name="store-api" options="-parameters" />

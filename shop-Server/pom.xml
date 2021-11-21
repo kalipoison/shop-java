@@ -13,6 +13,7 @@
         <module>shop-member</module>
         <module>shop-message</module>
         <module>shop-cart</module>
+        <module>shop-order</module>
     </modules>
 
     <parent>
