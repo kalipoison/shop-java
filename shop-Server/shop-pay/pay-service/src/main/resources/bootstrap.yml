@@ -1,0 +1,23 @@
+spring:
+    application:
+        name: pay-service
+    cloud:
+        config:
+            name: pay-service
+            profile: dev
+            label: master
+            discovery:
+                service-id: config-server
+                enabled: true
+    main:  # 允许bean的定义对象被重写 可以有多个 IOC beanDefinition   IOC  Map <type,value> A B   B A
+        allow-bean-definition-overriding: true
+eureka:
+    client:
+        service-url:
+            defaultZone: ${EUREKA_SERVER:http://admin:admin@localhost:8761/eureka}
+    instance:
+        hostname: ${HOST:localhost}
+        prefer-ip-address: true
+        instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+        lease-renewal-interval-in-seconds: 3
+        lease-expiration-duration-in-seconds: 9

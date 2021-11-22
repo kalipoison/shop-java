@@ -9,9 +9,11 @@
         <outputRelativeToContentRoot value="true" />
         <module name="search-api" />
         <module name="cart-service" />
+        <module name="pay-service" />
         <module name="auth-server" />
         <module name="product-service" />
         <module name="store-api" />
+        <module name="pay-api" />
         <module name="order-api" />
         <module name="eureka-server" />
         <module name="message-service" />
@@ -48,6 +50,8 @@
       <module name="message-service" target="8" />
       <module name="order-api" target="8" />
       <module name="order-service" target="8" />
+      <module name="pay-api" target="8" />
+      <module name="pay-service" target="8" />
       <module name="product-api" target="8" />
       <module name="product-service" target="8" />
       <module name="search-api" target="8" />
@@ -58,6 +62,7 @@
       <module name="shop-member" target="8" />
       <module name="shop-message" target="8" />
       <module name="shop-order" target="8" />
+      <module name="shop-pay" target="8" />
       <module name="shop-product" target="8" />
       <module name="shop-search" target="8" />
       <module name="shop-service" target="8" />
@@ -84,6 +89,8 @@
       <module name="message-service" options="-parameters" />
       <module name="order-api" options="-parameters" />
       <module name="order-service" options="-parameters" />
+      <module name="pay-api" options="-parameters" />
+      <module name="pay-service" options="-parameters" />
       <module name="product-api" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="search-api" options="-parameters" />
