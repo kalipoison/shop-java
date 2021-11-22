@@ -105,7 +105,7 @@ public class UserAddrController {
         return ResponseEntity.ok().build();
     }
 
-
+    // ---------------------------远程调用
 
     /**
      * 查询用户的默认收货地址

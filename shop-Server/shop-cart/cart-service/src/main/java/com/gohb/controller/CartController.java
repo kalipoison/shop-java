@@ -74,6 +74,7 @@ public class CartController {
         return ResponseEntity.ok(cartMoney);
     }
 
+    // ---------------- 远程调用代码
 
     /**
      * 提供远程调用购物车 拿到购物车的商品集合

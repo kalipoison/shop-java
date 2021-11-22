@@ -317,5 +317,49 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
         return prod;
     }
 
+    /**
+     * 修改库存的方法
+     * 操作两个表
+     *
+     * @param stockMap
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void changeStock(Map<String, Map<Long, Integer>> stockMap) {
+        // 拿到prod
+        Map<Long, Integer> prodStock = stockMap.get("prod");
+        // 先把匹配的的prod查出来
+        Set<Long> prodIds = prodStock.keySet();
+        List<Prod> prodList = prodMapper.selectBatchIds(prodIds);
+        // 在代码中循环 修改库存 最后更新
+        prodList.forEach(prod -> {
+            Integer stock = prodStock.get(prod.getProdId());
+            int finalStock = prod.getTotalStocks() + stock;
+            if (finalStock < 0) {
+                // 库存不足
+                throw new IllegalArgumentException("库存不足");
+            }
+            prod.setTotalStocks(finalStock);
+            prod.setUpdateTime(new Date());
+        });
+        // 统一修改
+        this.updateBatchById(prodList);
+
+        Map<Long, Integer> skuStock = stockMap.get("sku");
+        Set<Long> skuIds = skuStock.keySet();
+        List<Sku> skuList = skuService.listByIds(skuIds);
+        skuList.forEach(sku -> {
+            Integer stock = skuStock.get(sku.getSkuId());
+            int finalStock = sku.getActualStocks() + stock;
+            if (finalStock < 0) {
+                // 库存不足
+                throw new IllegalArgumentException("库存不足");
+            }
+            sku.setActualStocks(finalStock);
+            sku.setStocks(finalStock);
+            sku.setUpdateTime(new Date());
+        });
+        skuService.updateBatchById(skuList);
+    }
 
 }

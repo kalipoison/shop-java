@@ -45,4 +45,12 @@ public interface ProdService extends IService<Prod> {
      * @return
      */
     Prod findProdAndSkuById(Long prodId);
+
+
+    /**
+     * 修改库存的方法
+     *
+     * @param stockMap
+     */
+    void changeStock(Map<String, Map<Long, Integer>> stockMap);
 }

@@ -17,12 +17,12 @@ public interface QueueConstant {
     /**
      * 修改库存的交换机
      */
-    String PROD_CHANGE_EXCHANGE = "prod.change.ex";
+    String PROD_CHANGE_EX = "prod.change.ex";
 
     /**
      * 修改库存的路由key
      */
-    String PROD_ROUTER_KEY = "prod.change.key";
+    String PROD_CHANGE_KEY = "prod.change.key";
 
 
     /**

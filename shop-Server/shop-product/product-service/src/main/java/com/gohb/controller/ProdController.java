@@ -103,6 +103,18 @@ public class ProdController {
             return skuService.listByIds(skuIds);
     }
 
+    /**
+     * 修改库存的方法
+     *
+     * @param stockMap
+     */
+    @PostMapping("changeStock")
+    @ApiOperation("修改库存的方法")
+    void changeStock(@RequestBody Map<String, Map<Long, Integer>> stockMap) {
+        prodService.changeStock(stockMap);
+    }
+
+
     //-----------------------------前台代码
 
     @GetMapping("prod/prodInfo")
@@ -111,22 +123,6 @@ public class ProdController {
         Prod prod = prodService.findProdAndSkuById(prodId);
         return ResponseEntity.ok(prod);
     }
-
-
-
-//
-//
-//    /**
-//     * 修改库存的方法
-//     *
-//     * @param stockMap
-//     */
-//    @PostMapping("changeStock")
-//    @ApiOperation("修改库存的方法")
-//    void changeStock(@RequestBody Map<String, Map<Long, Integer>> stockMap) {
-//        prodService.changeStock(stockMap);
-//    }
-
 
 
 }
